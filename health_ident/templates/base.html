@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>{% block title %}Accueil{% endblock %} - Health - Ident</title>
+        {% include "css_tags.html" %}
+    </head>
+    <body class="{{ page }}">
+
+        <div class="container">
+
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse"><span class="sr-only">Toggle navigation</span></button>
+              </div>
+              <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li {% ifequal page 'dashboard' %} class="active"{% endifequal %}><a href="{% url 'dashboard' %}">Tableau de bord&nbsp;</a></li>
+                </ul>
+              </div>
+            </nav>
+
+            {% block content %}{% endblock %}
+
+        </div>
+    </body>
+</html>
