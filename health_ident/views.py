@@ -10,6 +10,12 @@ from django.shortcuts import render
 from health_ident.models import HealthEntity, Entity, AdministrativeEntity
 
 
+def about(request, entity_slug=None):
+    context = {"page": "about"}
+
+    return render(request, "about.html", context)
+
+
 def browser(request, entity_slug=None):
     context = {"page": "browser"}
     health_center = False
