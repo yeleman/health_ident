@@ -1,7 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Qu'est-ce que c'est ?</h2>
-<p>dasddas</p>
-<p><a href="/donwload/"><button type="button" class="btn btn-primary btn-lg"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER EN CSV (4,37 Mio)</button></a>
+<p>La Carte Sanitaire Numérique est une <strong>codification numérique</strong> de <strong>toutes les structures de santé du Mali</strong>.</p>
+<p><a href="{% url 'download' all_entities_file %}"><button type="button" class="btn btn-primary"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CARTE SANITAIRE NUMÉRIQUE (BDD SQLite)</button></a></p>
+
+<table class="table table-striped ">
+<legend>Quelques Statistiques</legend>
+<tr><th>Nombre d'Unités Sanitaires</th><td>{{ nb_cscom_total }}</td>
+<tr><th>Nombre de Districts</th><td>{{ nb_district_total }}</td>
+<tr><th>Nombre de Villages</th><td>{{ nb_village_total }}</td>
+<tr><th>Nombre de Communes</th><td>{{ nb_commune_total }}</td>
+<tr><th>Nombre de Cercles</th><td>{{ nb_cercle_total }}</td>
+<tr><th>Nombre de villages non-rattachés</th><td>{{ nb_village_alone }}</td>
+<tr><th>Nombre de villages sans coordonnées GPS</th><td>{{ nb_village_nocoord }}</td>
+<tr><th>Nombre de CSCom sans coordonnées GPS</th><td>{{ nb_cscom_nocoord }}</td>
+</table>
+
+<h2>Rapport avec la Carte Sanitaire <em>historique</em> ?</h2>
+<p>La carte historique (réalisé et maintenue par la DNS/CPS) présente plusieurs limitations qui n'en font pas un bon candidat pour un système tout numérique :
+    <ul>
+        <li>Elle n'est pas codifiée de manière unique et numérique.</li>
+        <li>La <em>codification</em> est basée sur le nom de l'unité.</li>
+        <li>La fréquence de mise à jour est très lente.</li>
+        <li>Elle n'est pas accessible librement.</li>
+        <li>Les villages concernés par une aire de santé ne sont pas indiqués/codifiés.</li>
+        <li>Il n'existe pas de fichier unique présentant toutes les données.</li>
+        <li>Il n'y a pas de mécanisme de remontée d'informations (mises à jour) pour les partenaires.</li>
+    </ul></p>
+    <p>Pour toutes ces raisons, et principalement dans le but d'être capable d'aggréger des données communautaires (niveau village) avec des données sanitaires, l'ANTIM a créé cette <strong>Carte Sanitaire Numérique (CSN)</strong>.</p>
+    <p>Le but de la CSN est d'être le socle de toutes les collectes de données numériques : que tous ces systèmes identifient les structures par les codes disponibles ici.</p>
+
+<h2>Télécharger</h2>
+<p><strong>L'utilisation et la distribution de la CSN sont gratuite</strong>. Celle-ci se trouve dans le domaine public.</p>
+<p>Vous êtes encouragé à l'utiliser ainsi qu'à l'améliorer.</p>
+<p><a href="{% url 'download' admin_entities_file %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CODES MATCL (CSV)</button></a> <a href="{% url 'download' health_entities_file %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER PYRAMIDE SANITAIRE (CSV)</button></a></p>
+<p><a href="{% url 'download' all_entities_file %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CARTE SANITAIRE NUMÉRIQUE (Export SQL)</button></a></p>
+<p><a href="{% url 'download' all_entities_sql %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CARTE SANITAIRE NUMÉRIQUE (BDD SQLite)</button></a></p>
+
+<h2>Qualité des données</h2>
+<p>La CSN a été établi à partir de plusieurs sources :
+    <ul>
+        <li>La base des Unités Sanitaires de l'<strong>OCHA</strong>, mise à jour en mai 2013 et croisé avec les données de la CPS.</li>
+        <li>La base de données administratives du <strong>MATCL</strong> fournie en 2012, corrigée (codes non-uniques).</li>
+        <li>La mission de mise à jour des informations de l'<strong>ANTIM</strong>, en décembre 2012.</li>
+    </ul>
+Il est important de noter qu'<strong>aucune de ces sources n'est entièrement fiable ni à jour</strong>. La qualité des données s'améliorera avec le temps car l'un des problèmes majeurs que souhaite résoudre la CSN est la mise à jour des données.</p>
+<p>Ainsi, cette plateforme est l'outil sur lequel tous les acteurs (essentiellement les Chargés SIS) vont s'appuyer pour corriger et mettre à jour les informations à leurs disposition.</p>
+
+<p>Pour des raisons de sécurité, la correspondance Unité Sanitaire-Village n'a pas pu être établie pour les trois régions du nord.</p>
+
+<h2>Qui l'utilise ?</h2>
+<p>La CSN est utilisé par le <strong>Système Numérique d'Information Sanitaire Intégré (SNISI)</strong> qui regroupe lui-même plusieurs projets :
+    <ul>
+        <li><strong>PNLP</strong>/MEASURE Evaluation : Routine mensuel paludisme dans tous les centres des régions de Ségou et Mopti ainsi que dans les districs Commune 4 et Commune 5 de Bamako.</li>
+        <li><strong>FNUAP</strong> : Enregistrements des données communautaires (naissances, décès, stocks) pour la santé de la reproduction dans deux districts de Ségou et 2 districts de Koulikoro.</li>
+        <li><strong>PNLC</strong>/<strong>SightSavers</strong> : Missions de chirurgie du trachome trichiasys dans toute la région de Koulikoro.</li>
+    </ul>
+</p>
+
+<h2>Rapporter une erreur</h2>
+<p>Bientôt, tous les chargés SIS seront invités à mettre à jour les informations concernant leurs districts respectifs afin d'avoir une base de données fiable et à jour, que tout le monde peut utiliser sans crainte.</p>
+<p>Pour signaler une anomalie et/ou proposer une correction, merci d'utiliser le formulaire de contact disponible sur les pages des Unités Sanitaires (rubrique <a href="{% url 'browser' %}">parcourir</a>).</p>
+<p>Vous pouvez aussi nous écrire à <a href="mailto:ident@sante.gov.ml">ident@sante.gov.ml</a>.</p>
+
+<p><a href="http://opendata.ml"><img src="http://opendata.ml/static/img/logo_opendata.png" height="50" /></a></p>
 {% endblock %}

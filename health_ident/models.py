@@ -121,3 +121,5 @@ class AdministrativeEntity(Entity):
                                       related_name=_("admin_entities"))
 
 reversion.register(Entity)
+
+
