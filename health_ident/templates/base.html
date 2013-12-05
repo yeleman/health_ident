@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>{% block title %}Accueil{% endblock %} - Health - Ident</title>
+        <title>Carte Sanitaire Numérique - Ministère de la Santé du Mali</title>
         {% include "css_tags.html" %}
     </head>
     <body class="{{ page }}">
@@ -11,18 +11,23 @@
         <div class="container">
 
             <nav class="navbar navbar-default" role="navigation">
-                <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse"><span class="sr-only">Toggle navigation</span></button>
+              <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'about' %}">Carte Sanitaire Numérique</a>
               </div>
-              <div class="collapse navbar-collapse navbar-ex1-collapse">
+
+              <!-- Collect the nav links, forms, and other content for toggling -->
+              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li {% ifequal page 'dashboard' %} class="active"{% endifequal %}><a href="{% url 'dashboard' %}">Tableau de bord&nbsp;</a></li>
+                  <li{% if page = "" %} class="active"{% endif %}><a href="{% url 'about' %}">À propos</a></li>
+                  <li{% if page = "browser" %} class="active"{% endif %}><a href="{% url 'browser' %}">Parcourir</a></li>
+                  <li{% if page = "map" %} class="active"{% endif %}><a href="{% url 'map' %}">Carte</a></li>
                 </ul>
-              </div>
+              </div><!-- /.navbar-collapse -->
             </nav>
 
+            <div class="content">
             {% block content %}{% endblock %}
-
+            </div>
         </div>
     </body>
 </html>

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load ident %}
+
+{% block content %}
+<h2>Unité Sanitaire de “{{ entity.name }}/{{ entity.slug }}”</h2>
+
+<ol class="breadcrumb">
+{% for child in entity.get_ancestors %}
+    <li><a href="{% url 'browser_at' child.slug %}">{{ child|hnametype }}</a></li>
+{% endfor %}
+    <li class="active">{{ entity|hnametype }}</li>
+</ol>
+
+{% if not health_center %}
+<table class="table table-striped table-bordered">
+<thead>
+<legend>Liste des unités sanitaires de {{ entity.name }}</legend>
+<tr><th>Code</th><th>Nom</th><th>Coord. GPS</th></tr>
+</thead>
+<tbody>
+{% for child in entity.get_children|hentities %}
+<tr><td><a href="{% url 'browser_at' child.slug %}">{{ child.slug}}</a></td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td>
+{% endfor %}
+</tbody>
+</table>
+
+{% else %}
+<div class="row">
+
+    <div class="col-md-5">
+        <dl>
+            <dt>Nom</dt>
+            <dd>{{ entity.name }}</dd>
+            {% if entity.gps %}
+            <dt>Latitude</dt>
+            <dd>{{ entity.latitude|default_if_none:"" }}</dd>
+            <dt>Longitude</dt>
+            <dd>{{ entity.longitude|default_if_none:"" }}</dd>
+            {% endif %}
+            <dt>Dernière modification</dt>
+            <dd>{{ entity.modified_on }}</dd>
+            {% for key, value in entity.extra_data %}
+            <dt>{{ key }}</dt>
+            <dd>{{ value }}</dd>
+            {% endfor %}
+        </dl>
+
+        {% if entity.gps %}<p><a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> Voir sur OpenStreetMap</a></p>{% endif %}
+    </div>
+
+    <div class="col-md-7">
+        <div id="minimap"></div>
+    </div>
+
+</div>
+
+<table class="table table-striped table-bordered">
+<thead>
+<legend>Liste des villages <em>rattachés</em> à {{ entity.name }}</legend>
+<tr><th>Code MATCL</th><th>Nom</th><th>Coord. GPS</th></tr>
+</thead>
+<tbody>
+{% for child in villages %}
+<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{{ child.gps|default_if_none:"" }}</td>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+<script type="text/javascript">
+var map;
+
+function createMap() {
+
+    {% if entity.gps %}
+    var hc_lat = {{entity.latitude|floatformat:6 }};
+    var hc_lon = {{entity.longitude|floatformat:6 }};
+    zoom = 11;
+    {% else %}
+    var hc_lat = 17.874;
+    var hc_lon = -5.493;
+    zoom = 5;
+    {% endif %}
+
+    map = L.mapbox.map('minimap', 'rgaudin.gfak5lf0')
+        .setView([hc_lat, hc_lon], zoom);
+
+    var addressPoints = [
+    {% for village in villages %}
+    {% if village.gps %}
+    [{{ village.latitude|floatformat:6 }}, {{ village.longitude|floatformat:6 }}, "{{ village|hnametype }}"],
+    {% endif %}
+    {% endfor %}
+    ];
+
+    var markers = new L.MarkerClusterGroup();
+
+    for (var i = 0; i < addressPoints.length; i++) {
+        var a = addressPoints[i];
+        var title = a[2];
+        var marker = L.marker(new L.LatLng(a[0], a[1]), {
+            icon: L.mapbox.marker.icon({'marker-symbol': 'village', 'marker-color': '#285784'}),
+            title: title
+        });
+        marker.bindPopup(title);
+        markers.addLayer(marker);
+    }
+
+    {% if entity.gps %}
+    marker = L.marker(new L.LatLng(hc_lat, hc_lon), {
+            icon: L.mapbox.marker.icon({'marker-symbol': 'hospital', 'marker-color': '#285784'}),
+            title: "{{ entity.name }}"});
+    marker.bindPopup("{{ entity.name }}");
+    markers.addLayer(marker);
+    {% endif %}
+
+    map.addLayer(markers);
+}
+createMap();
+</script>
+{% endblock %}

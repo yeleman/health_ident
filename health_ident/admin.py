@@ -7,11 +7,17 @@ from __future__ import (unicode_literals, absolute_import,
 
 from django.contrib import admin
 
-from health_ident.models import (Entity, HealthEntity, AdministrativeEntity,
-                                 HealthEntityInfo)
+from health_ident.models import (Entity, HealthEntity, AdministrativeEntity)
 
 
-admin.site.register(Entity)
-admin.site.register(HealthEntity)
-admin.site.register(AdministrativeEntity)
-admin.site.register(HealthEntityInfo)
+class EntityAdmin(admin.ModelAdmin):
+
+    list_display = ('slug', 'name', 'type', 'parent', 'parent_level')
+    list_filter = ('type',)
+    ordering = ('slug',)
+    search_fields = ('slug', 'name')
+
+
+admin.site.register(Entity, EntityAdmin)
+admin.site.register(HealthEntity, EntityAdmin)
+admin.site.register(AdministrativeEntity, EntityAdmin)

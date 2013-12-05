@@ -1,2 +1,28 @@
-<link href="{{ STATIC_URL }}css/bootstrap.min.css?v=3.0.0" rel="stylesheet">
-<link href="{{ STATIC_URL }}css/health_ident.css?b=20130928" rel="stylesheet">
+{% load staticfiles %}
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+
+ <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+<script src='http://api.tiles.mapbox.com/mapbox.js/v1.5.1/mapbox.js'></script>
+<link href='http://api.tiles.mapbox.com/mapbox.js/v1.5.1/mapbox.css' rel='stylesheet' />
+
+<link rel="stylesheet" href="https://www.mapbox.com/mapbox.js/assets/MarkerCluster.css" />
+<link rel="stylesheet" href="https://www.mapbox.com/mapbox.js/assets/MarkerCluster.Default.css" />
+<script src="https://www.mapbox.com/mapbox.js/assets/leaflet.markercluster.js"></script>
+
+<style type="text/css">
+
+#map {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ccc;
+    }
+
+#minimap {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ccc;
+    }
+
+</style>

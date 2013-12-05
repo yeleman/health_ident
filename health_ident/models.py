@@ -5,16 +5,24 @@
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
 
+import reversion
 from py3compat import implements_to_string
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils import timezone
 from mptt.models import MPTTModel, TreeForeignKey
 from mptt.managers import TreeManager
 from picklefield.fields import PickledObjectField
+
+
+def casted_entity(slug):
+    try:
+        return HealthEntity.objects.get(slug=slug)
+    except HealthEntity.DoesNotExist:
+        try:
+            return AdministrativeEntity.objects.get(slug=slug)
+        except AdministrativeEntity.DoesNotExist:
+            return Entity.objects.get(slug=slug)
 
 
 @implements_to_string
@@ -32,7 +40,7 @@ class EntityType(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
+@implements_to_string
 class Entity(MPTTModel):
 
     class Meta:
@@ -49,11 +57,24 @@ class Entity(MPTTModel):
                             verbose_name=_("Parent"))
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    active = models.BooleanField(default=True)
+    active_changed_on = models.DateTimeField(default=timezone.now)
+    modified_on = models.DateTimeField(default=timezone.now)
+    extra_data = PickledObjectField(null=True, blank=True)
 
     objects = TreeManager()
 
     def __str__(self):
         return self.name
+
+    def to_dict(self):
+        return {'slug': self.slug,
+                'name': self.name,
+                'type': self.type.slug,
+                'parent': getattr(self.parent, 'slug', None),
+                'latitude': self.latitude,
+                'longitude': self.longitude,
+                'active': self.active}
 
     def display_name(self):
         return self.name.title()
@@ -72,7 +93,8 @@ class Entity(MPTTModel):
     def parent_level(self):
         if self.parent:
             return self.parent.type
-        return self.parent
+        # return self.parent
+        return "NO PARENT"
 
     @property
     def gps(self):
@@ -87,10 +109,6 @@ class HealthEntity(Entity):
         verbose_name = _("Health Entity")
         verbose_name_plural = _("Health Entities")
 
-    phone_number = models.CharField(max_length=12, unique=True,
-                                    null=True, blank=True,
-                                    verbose_name=_("Phone Number"))
-
 
 class AdministrativeEntity(Entity):
 
@@ -102,23 +120,4 @@ class AdministrativeEntity(Entity):
     health_entity = models.ForeignKey(HealthEntity, blank=True, null=True,
                                       related_name=_("admin_entities"))
 
-
-@receiver(pre_save, sender=HealthEntity)
-def pre_save_entity(sender, instance, **kwargs):
-    """ mark phone_number as None is not filled """
-    if instance.phone_number == "":
-        instance.phone_number = None
-
-
-@implements_to_string
-class HealthEntityInfo(models.Model):
-
-    class Meta:
-        app_label = 'health_ident'
-        verbose_name = _("Health Entity Info")
-        verbose_name_plural = _("Health Entities Info")
-
-    created_on = models.DateTimeField(null=True, blank=True)
-    modified_on = models.DateTimeField(default=timezone.now)
-    health_entity = models.OneToOneField('HealthEntity', verbose_name='Health Entity')
-    value = PickledObjectField(null=True, blank=True)
+reversion.register(Entity)

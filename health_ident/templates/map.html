@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<h2>Cartographie des Unités Sanitaires</h2>
+<p>La carte ci-dessous indique la position de chacun des centres de santé (CSCom et CSRéf) du Mali.</p>
+<p>Sur un total de <strong>{{ nb_centers_total }} centres</strong> il nous manque les coordonnées GPS de <strong>{{ nb_centers_nocoords }} centres</strong>. N'hésitez pas à nous les communiquer !</p>
+<p>Pour voir les coordonnées des villages <em>rattachés</em> à chaque CSCom, veuillez consulter la section <a href="{% url 'browser' %}">Parcourir</a>.</p>
+<div id="map"></div>
+<script type="text/javascript">
+
+var map;
+
+function createMap() {
+
+    map = L.mapbox.map('map', 'rgaudin.gfak5lf0')
+        .setView([17.874, -5.493], 6)
+        .addControl(L.mapbox.geocoderControl('rgaudin.gfak5lf0'));
+
+
+    var addressPoints = [
+    {% for entity in health_entities %}
+    [{{ entity.latitude|floatformat:6 }}, {{ entity.longitude|floatformat:6 }}, "{{ entity.name }}"],
+    {% endfor %}
+    ];
+
+    var markers = new L.MarkerClusterGroup();
+
+    for (var i = 0; i < addressPoints.length; i++) {
+        var a = addressPoints[i];
+        var title = a[2];
+        var marker = L.marker(new L.LatLng(a[0], a[1]), {
+            icon: L.mapbox.marker.icon({'marker-symbol': 'hospital', 'marker-color': '#285784'}),
+            title: title
+        });
+        marker.bindPopup(title);
+        markers.addLayer(marker);
+    }
+
+    map.addLayer(markers);
+}
+
+function moveToCoords(position, zoom) {
+    map.setView([position.coords.latitude, position.coords.longitude], zoom);
+}
+
+function success(position) {
+    moveToCoords(position, 15);
+}
+
+function error(msg) {
+    console.log(msg);
+}
+
+createMap();
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+} else {
+    error('not supported');
+}
+
+</script>
+{% endblock %}

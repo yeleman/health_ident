@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="cercle" model="health_ident.entitytype">
+        <field type="CharField" name="name">Cercle</field>
+    </object>
+    <object pk="commune" model="health_ident.entitytype">
+        <field type="CharField" name="name">Commune</field>
+    </object>
+    <object pk="country" model="health_ident.entitytype">
+        <field type="CharField" name="name">Pays</field>
+    </object>
+    <object pk="health_center" model="health_ident.entitytype">
+        <field type="CharField" name="name">Unité sanitaire</field>
+    </object>
+    <object pk="health_district" model="health_ident.entitytype">
+        <field type="CharField" name="name">District Sanitaire</field>
+    </object>
+    <object pk="health_region" model="health_ident.entitytype">
+        <field type="CharField" name="name">Région sanitaire</field>
+    </object>
+    <object pk="region" model="health_ident.entitytype">
+        <field type="CharField" name="name">Région</field>
+    </object>
+    <object pk="vfq" model="health_ident.entitytype">
+        <field type="CharField" name="name">Village</field>
+    </object>
+</django-objects>
