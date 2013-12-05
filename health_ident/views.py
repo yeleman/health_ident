@@ -8,7 +8,7 @@ from __future__ import (unicode_literals, absolute_import,
 import smtplib
 
 from django import forms
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.core.context_processors import csrf
 from django.core import mail
 from django.conf import settings
@@ -20,11 +20,17 @@ from health_ident import get_last_export
 from health_ident.models import HealthEntity, Entity, AdministrativeEntity
 
 
-
 class ContactForm(forms.Form):
-    subject = forms.CharField(max_length=100, label="Objet")
-    message = forms.CharField(widget=forms.Textarea, required=True)
-    sender = forms.EmailField(label="Votre e-mail", required=True)
+    contact = forms.CharField(max_length=100, required=True,
+                              label="Votre contact (email, téléphone)",
+                              widget=forms.TextInput(attrs={'class': 'form-control',
+                                                            'placeholder': "M. XXX, Chargé SIS à YYY. 77 77 77 77"}))
+    message = forms.CharField(required=True,
+                              widget=forms.Textarea(attrs={'class': 'form-control'}))
+    entity_slug = forms.CharField(required=True,
+                                  widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                'readonly': 'readonly'}))
+
 
 def about(request, entity_slug=None):
     context = {"page": "about"}
@@ -72,14 +78,29 @@ def browser(request, entity_slug=None):
 
     if entity.type.slug == 'health_center':
         health_center = True
-        initial_data = {'subject': "Modification de {} {}".format(entity.name, entity_slug),
-                        'entity': entity}
-        form = ContactForm(initial=initial_data)
 
-        context.update({'villages': AdministrativeEntity.objects.filter(health_entity=entity),
-                        'form': form})
+        context.update({'villages': AdministrativeEntity.objects.filter(health_entity=entity)})
 
-    context.update({'health_center': health_center, 'entity_slug': entity_slug})
+    context.update({'health_center': health_center})
+
+    initial = {
+        'message': "Modification de {}/{}".format(entity.name, entity_slug),
+        'entity_slug': entity.slug}
+
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            body = "{}\n\n".format(form.cleaned_data.get('message'),
+                                   form.cleaned_data.get('contact'))
+            subject = "[IDENT] Correction pour {}".format(form.cleaned_data.get('entity_slug'))
+            send_email(recipients=settings.RECIPIENTS,
+                       message=body,
+                       title=subject)
+            form = ContactForm(initial=initial)
+
+    else:
+        form = ContactForm(initial=initial)
+    context.update({'form': form})
 
     return render(request, "browser.html", context)
 
@@ -163,17 +184,3 @@ def send_email(recipients, message=None, template=None, context={}, \
     except smtplib.SMTPException as e:
         # log that error
         return (False, e)
-
-
-def contact(request, entity_slug=None):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            subject = form.cleaned_data['subject']
-            message = form.cleaned_data['message']
-            sender = form.cleaned_data['sender']
-            send_email(recipients=settings.RECIPIENTS,
-                       message=message, title=subject,
-                       sender=sender)
-
-    return redirect('browser_at', entity_slug=entity_slug)

@@ -17,3 +17,8 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default.
     }
 }
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+
+RECIPIENTS = []

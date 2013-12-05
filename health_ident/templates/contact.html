@@ -1,20 +1,14 @@
-<form action="{% url 'contact' entity.slug %}" method="post"  class="form-search" enctype="multipart/form-data">{% csrf_token %}
-    <table class="table table-bordered">
-        <tbody>
-            <tr>
-                <td>{{form.subject.label}}:</td>
-                <td>{{form.subject}} {{form.subject.errors}}</td>
-            </tr>
-            <tr>
-                <td>{{form.message.label}}:</td>
-                <td>{{form.message}} {{form.message.errors}}</td>
-            </tr>
-            <tr>
-                <td>{{form.sender.label}}:</td>
-                <td>{{form.sender}} {{form.sender.errors}}</td>
-            </tr>
-            </tr>
-        </tbody>
-    </table>
-    <input type='submit' class="btn btn-info btn-lg" value="Commenter"/>
+
+<form action="" method="post" class="form" role="form">{% csrf_token %}
+<legend>Signler une erreur</legend>
+{% for field in form %}
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
+    {{ field.label_tag }}
+    {% if field.errors %} <span class="">{{ field.errors.0 }}</span>{% endif %}
+    {{ field }}
+  </div>
+{% endfor %}
+<button type='submit' class="btn btn-primary">Envoyer le message</button>
 </form>
+
+<p></p>

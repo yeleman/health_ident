@@ -79,11 +79,17 @@ USE_L10N = True
 USE_TZ = True
 
 EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
+EMAIL_PORT = 25
+EMAIL_SENDER = "IDENT Sante <ident@sante.gov.ml>"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
 
-RECIPIENTS = ['reg@yeleman.com', 'alou@yeleman.com', 'ibrahima@yeleman.com']
+RECIPIENTS = []
+
+try:
+    from health_ident.settings_local import *
+except ImportError:
+    pass
