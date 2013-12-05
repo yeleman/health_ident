@@ -28,9 +28,14 @@
 <div class="row">
 
     <div class="col-md-5">
+        <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.slug}}</h3>
         <dl>
             <dt>Nom</dt>
             <dd>{{ entity.name }}</dd>
+            <dt>District Sanitaire</dt>
+            <dd>{{ entity.parent }}</dd>
+            <dt>Nb de villages</dt>
+            <dd>{{ villages|length }} rattaché{{ villages|length|pluralize }}</dd>
             {% if entity.gps %}
             <dt>Latitude</dt>
             <dd>{{ entity.latitude|default_if_none:"" }}</dd>
@@ -61,7 +66,7 @@
 </thead>
 <tbody>
 {% for child in villages %}
-<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{{ child.gps|default_if_none:"" }}</td>
+<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td>
 {% endfor %}
 </tbody>
 </table>
