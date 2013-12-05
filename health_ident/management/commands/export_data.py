@@ -55,15 +55,15 @@ class Command(BaseCommand):
         call_command("export_admin_entities", input_file=admin_file)
 
         print("Exporting Health Entities into SQLite")
-        cmd = "csvsql --table 'health_entities' --insert --db 'sqlite:///{}' {}".format(output_file, health_file)
+        cmd = "csvsql --table 'health_entities' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_file)
         envoy.run(cmd.encode('utf-8'))
 
         print("Exporting Admin Entities into SQLite")
-        cmd = "csvsql --table 'admin_entities' --insert --db 'sqlite:///{}' {}".format(output_file, admin_file)
+        cmd = "csvsql --table 'admin_entities' --insert --db 'sqlite:///{0}' {1}".format(output_file, admin_file)
         envoy.run(cmd.encode('utf-8'))
 
         print("Dumping SQLite into an SQL file")
-        cmd = "sqlite3 {} .dump".format(output_file)
+        cmd = "sqlite3 {0} .dump".format(output_file)
         r = envoy.run(cmd.encode('utf-8'))
         with open(output_sql, 'w') as f:
             f.write(r.std_out.decode('utf-8').encode('utf-8'))
