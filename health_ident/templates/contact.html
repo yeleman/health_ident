@@ -1,6 +1,6 @@
 
 <form action="" method="post" class="form" role="form">{% csrf_token %}
-<legend>Signler une erreur</legend>
+<legend>Signaler une erreur</legend>
 {% for field in form %}
     <div class="form-group {% if field.errors %}has-error{% endif %}">
     {{ field.label_tag }}
