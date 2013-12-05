@@ -43,10 +43,10 @@ class Command(BaseCommand):
 
         today = datetime.date.today()
         suffix = today.strftime("%Y-%m-%d")
-        output_file = os.path.join(export_dir, "all_entities-{}.sqlite".format(suffix))
-        output_sql = os.path.join(export_dir, "all_entities-{}.sql".format(suffix))
-        health_file = os.path.join(export_dir, "health_entities-{}.csv".format(suffix))
-        admin_file = os.path.join(export_dir, "admin_entities-{}.csv".format(suffix))
+        output_file = os.path.join(export_dir, "all_entities-{0}.sqlite".format(suffix))
+        output_sql = os.path.join(export_dir, "all_entities-{0}.sql".format(suffix))
+        health_file = os.path.join(export_dir, "health_entities-{0}.csv".format(suffix))
+        admin_file = os.path.join(export_dir, "admin_entities-{0}.csv".format(suffix))
 
         print("Exporting Health Entities")
         call_command("export_health_entities", input_file=health_file)
