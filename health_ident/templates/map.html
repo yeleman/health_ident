@@ -20,7 +20,7 @@ function createMap() {
 
     var addressPoints = [
     {% for entity in health_entities %}
-    [{{ entity.latitude|floatformat:6 }}, {{ entity.longitude|floatformat:6 }}, "{{ entity.name }}"],
+    [{{ entity.latitude|floatformat:6 }}, {{ entity.longitude|floatformat:6 }}, "{{ entity.name }}", "{{ entity.slug }}"],
     {% endfor %}
     ];
 
@@ -28,12 +28,15 @@ function createMap() {
 
     for (var i = 0; i < addressPoints.length; i++) {
         var a = addressPoints[i];
-        var title = a[2];
+        var name = a[2];
+        var slug = a[3];
+        var title = name + ' - ' + slug;
+        var link = '<a href="/browse/' + slug + '">' + title + '</a>';
         var marker = L.marker(new L.LatLng(a[0], a[1]), {
             icon: L.mapbox.marker.icon({'marker-symbol': 'hospital', 'marker-color': '#285784'}),
             title: title
         });
-        marker.bindPopup(title);
+        marker.bindPopup(link);
         markers.addLayer(marker);
     }
 

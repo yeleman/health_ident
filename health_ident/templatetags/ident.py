@@ -16,8 +16,14 @@ register = template.Library()
 def only_health_entities(entities):
     return [h for h in entities if HealthEntity.objects.filter(slug=h.slug).count()]
 
+
 @register.filter(name='hnametype')
 def type_formatted_name(entity):
     if entity.type.slug == 'country':
         return entity.name
     return "{type} de {entity}".format(type=entity.type.name, entity=entity.name).upper()
+
+
+@register.filter(name='villages')
+def villages_for_hcenter(entity):
+    return AdministrativeEntity.objects.filter(health_entity=entity)

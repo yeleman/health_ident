@@ -2,7 +2,7 @@
 {% load ident %}
 
 {% block content %}
-<h2>Unité Sanitaire de “{{ entity.name }}”  {{ entity.slug }}</h2>
+<h2>{{ entity|hnametype }}  {{ entity.slug }}</h2>
 
 <ol class="breadcrumb">
 {% for child in entity.get_ancestors %}
@@ -114,7 +114,8 @@ function createMap() {
             title: title
         });
         marker.bindPopup(title);
-        markers.addLayer(marker);
+        // markers.addLayer(marker);
+        marker.addTo(map);
     }
 
     {% if entity.gps %}
@@ -122,10 +123,11 @@ function createMap() {
             icon: L.mapbox.marker.icon({'marker-symbol': 'hospital', 'marker-color': '#285784'}),
             title: "{{ entity.name }}"});
     marker.bindPopup("{{ entity.name }}");
-    markers.addLayer(marker);
+    // markers.addLayer(marker);
+    marker.addTo(map);
     {% endif %}
 
-    map.addLayer(markers);
+    // map.addLayer(markers);
 }
 createMap();
 </script>
