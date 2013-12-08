@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 <p>La Carte Sanitaire Numérique est une <strong>codification numérique</strong> de <strong>toutes les structures de santé du Mali</strong>.</p>
@@ -72,5 +73,9 @@ Il est important de noter qu'<strong>aucune de ces sources n'est entièrement fi
 <p>Pour signaler une anomalie et/ou proposer une correction, merci d'utiliser le formulaire de contact disponible sur les pages des Unités Sanitaires (rubrique <a href="{% url 'browser' %}">parcourir</a>).</p>
 <p>Vous pouvez aussi nous écrire à <a href="mailto:csnmali@sante.gov.ml"><i class="glyphicon glyphicon-envelope"></i> csnmali@sante.gov.ml</a>.</p>
 
-<p><a href="http://opendata.ml"><img src="http://opendata.ml/static/img/logo_opendata.png" height="50" /></a></p>
+<div class="row">
+    <div class="col-xs-4 text-center"><a href="http://antim.sante.gov.ml"><img src="{% static '100px-ANTIM.png' %}" /></a></div>
+    <div class="col-xs-4 text-center"><a href="http://antim.sante.gov.ml"><img src="{% static '100px-Coat_of_arms_of_Mali.svg.png' %}" /></a></div>
+    <div class="col-xs-4 text-center"><a href="http://opendata.ml"><img src="http://opendata.ml/views/hotline-sos-2013/static/img/opendata.png" height="100" /></a></div>
+</div>
 {% endblock %}
