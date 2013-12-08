@@ -87,6 +87,8 @@ EMAIL_SENDER = "IDENT Sante <ident@sante.gov.ml>"
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 RECIPIENTS = []
 
 try:
