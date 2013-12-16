@@ -46,13 +46,22 @@ class Command(BaseCommand):
         output_file = os.path.join(export_dir, "all_entities-{0}.sqlite".format(suffix))
         output_sql = os.path.join(export_dir, "all_entities-{0}.sql".format(suffix))
         health_file = os.path.join(export_dir, "health_entities-{0}.csv".format(suffix))
+        health_properties_file = os.path.join(export_dir, "health_properties-{0}.csv".format(suffix))
+        health_history_file = os.path.join(export_dir, "health_history-{0}.csv".format(suffix))
         admin_file = os.path.join(export_dir, "admin_entities-{0}.csv".format(suffix))
+        j2me_file = os.path.join(export_dir, "j2me_csn-{0}.zip".format(suffix))
 
         print("Exporting Health Entities")
         call_command("export_health_entities", input_file=health_file)
 
         print("Exporting Admin Entities")
         call_command("export_admin_entities", input_file=admin_file)
+
+        print("Exporting Health Entity Properties")
+        call_command("export_health_entity_properties", input_file=health_properties_file)
+
+        print("Exporting Health Entity History")
+        call_command("export_health_entity_history", input_file=health_history_file)
 
         print("Exporting Health Entities into SQLite")
         cmd = "csvsql --table 'health_entities' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_file)
@@ -62,13 +71,19 @@ class Command(BaseCommand):
         cmd = "csvsql --table 'admin_entities' --insert --db 'sqlite:///{0}' {1}".format(output_file, admin_file)
         envoy.run(cmd.encode('utf-8'))
 
+        print("Exporting Health Entity Properties into SQLite")
+        cmd = "csvsql --table 'health_properties' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_properties_file)
+        envoy.run(cmd.encode('utf-8'))
+
+        print("Exporting Health Entity History into SQLite")
+        cmd = "csvsql --table 'health_history' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_history_file)
+        envoy.run(cmd.encode('utf-8'))
+
         print("Dumping SQLite into an SQL file")
-        cmd = "sqlite3 {0} .dump".format(output_file)
-        r = envoy.run(cmd.encode('utf-8'))
-        with open(output_sql, 'w') as f:
-            f.write(r.std_out.decode('utf-8').encode('utf-8'))
+        cmd = "sqlite3 {0} .dump {1}".format(output_file, output_sql)
+        envoy.run(cmd.encode('utf-8'))
+
+        print("Exporting J2ME Kit")
+        call_command("export_j2me", input_file=j2me_file)
 
         set_last_export(today)
-
-
-

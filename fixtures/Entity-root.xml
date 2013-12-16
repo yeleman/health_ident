@@ -5,8 +5,6 @@
         <field type="SlugField" name="slug">mali</field>
         <field to="health_ident.entitytype" name="type" rel="ManyToOneRel">country</field>
         <field to="health_ident.entity" name="parent" rel="ManyToOneRel"><None></None></field>
-        <field type="BooleanField" name="active">True</field>
-        <field type="DateTimeField" name="active_changed_on">2011-10-31T15:00:00+00:00</field>
         <field type="PositiveIntegerField" name="lft">1</field>
         <field type="PositiveIntegerField" name="rght">2</field>
         <field type="PositiveIntegerField" name="tree_id">1</field>

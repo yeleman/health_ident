@@ -57,11 +57,11 @@
 <table class="table table-striped table-bordered">
 <thead>
 <legend>Liste des villages <em>rattachés</em> à {{ entity.name }}</legend>
-<tr><th>Code MATCL</th><th>Nom</th><th>Coord. GPS</th></tr>
+<tr><th>Code MATCL</th><th>Nom</th><th>Coord. GPS</th><th>Distance CSCom (km)</th></tr>
 </thead>
 <tbody>
 {% for child in villages %}
-<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td>
+<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td><td>{{ child.distance|default_if_none:"n/c" }}</td>
 {% endfor %}
 </tbody>
 </table>
@@ -69,8 +69,8 @@
 <table class="table table-striped table-condensed table-bordered">
 <legend>Données de l'Unité Sanitaire</legend>
 <tbody>
-{% for key, value in entity.extra_data.items %}
-<tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+{% for prop in entity.properties.all %}
+<tr><th>{{ prop.name }}</th><td>{{ prop.value }}</td></tr>
 {% endfor %}
 </tbody>
 </table>

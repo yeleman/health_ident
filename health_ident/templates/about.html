@@ -36,10 +36,12 @@
 <p><strong>L'utilisation et la distribution de la CSN sont gratuite</strong>. Celle-ci se trouve dans le <strong><a href="https://creativecommons.org/publicdomain/zero/1.0/">domaine public (CC0)</a></strong>.</p>
 <p>Vous êtes encouragé à l'utiliser ainsi que de contribuer à son amélioration.</p>
 <ul>
-    <li><a href="{% url 'download' admin_entities_file %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CODES MATCL (CSV)</button></a></li>
-    <li><a href="{% url 'download' health_entities_file %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER PYRAMIDE SANITAIRE (CSV)</button></a></li>
-    <li><a href="{% url 'download' all_entities_sql %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CARTE SANITAIRE NUMÉRIQUE (Export SQL)</button></a></li>
-    <li><a href="{% url 'download' all_entities_file %}"><button type="button" class="btn btn-sm"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CARTE SANITAIRE NUMÉRIQUE (BDD SQLite)</button></a></li>
+    <li><a href="{% url 'download' admin_entities_file %}"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CODES MATCL (CSV)</button></a></li>
+    <li><a href="{% url 'download' health_entities_file %}"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER PYRAMIDE SANITAIRE (CSV)</button></a></li>
+    <li><a href="{% url 'download' health_properties_file %}"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER PROPRIÉTÉS DE LA CSN (CSV)</button></a></li>
+    <!-- <li><a href="{% url 'download' health_history_file %}"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER HISTORIQUE DE LA CSN (CSV)</button></a></li> -->
+    <li><a href="{% url 'download' all_entities_file %}"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER CARTE SANITAIRE NUMÉRIQUE (BDD SQLite)</button></a> <a href="http://www.sqliteexpert.com/SQLiteExpertPersSetup.exe"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER SQLiteExpert Personnal (Visualiseur SQLite, gratuit)</button></a></li>
+    <li><a href="{% url 'download' j2me_file %}"><button type="button" class="btn btn-xs"><i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER LE KIT JAVA (J2ME)</button></a> cf. Application de démonstration sur <a href="http://github.com/yeleman/demo_csn_j2me"> Github (yeleman/demo_csn_j2me)</a></li>
 </ul>
 <div class="alert alert-warning"><p><i class="glyphicon glyphicon-warning-sign"></i> Le format de la CSN n'est pas définitif. Les fondations (identifiants uniques et liés) sont présentes et nous sommes ouverts à toute proposition d'amélioration/extension.</p>
 <p>Merci de prendre contact avec <a href="mailto:csnmali@sate.gov.ml"><i class="glyphicon glyphicon-envelope"></i> csnmali@sante.gov.ml</a>.</p></div>

@@ -40,11 +40,17 @@ def about(request, entity_slug=None):
     output_file = "all_entities-{}.sqlite".format(suffix)
     output_sql = "all_entities-{}.sql".format(suffix)
     health_file = "health_entities-{}.csv".format(suffix)
+    health_properties_file = "health_properties-{}.csv".format(suffix)
+    health_history_file = "health_history-{}.csv".format(suffix)
     admin_file = "admin_entities-{}.csv".format(suffix)
+    j2me_file = "j2me_csn-{0}.zip".format(suffix)
 
     context.update(({'last_export_date': last_export_date,
                      'admin_entities_file': admin_file,
+                     'j2me_file': j2me_file,
                      'health_entities_file': health_file,
+                     'health_properties_file': health_properties_file,
+                     'health_history_file': health_history_file,
                      'all_entities_file': output_file,
                      'all_entities_sql': output_sql}))
 

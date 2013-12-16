@@ -29,14 +29,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         headers = ['IDENT_Code', 'IDENT_Name', 'IDENT_Type', 'IDENT_ParentCode',
-                   'IDENT_Active', 'IDENT_ActiveChangedOn', 'IDENT_ModifiedOn',
+                   'IDENT_ModifiedOn',
                    'IDENT_HealthRegionCode', 'IDENT_HealthDistricCode',
-                   'Map Admin1', 'Map Admin2', 'Region', 'District',
-                   'Facility Name', 'Facility_Type', 'Facility Type Recoded',
-                   'Start Date', 'Accessibility', 'Source', 'Population',
-                   'Village Number', 'Distance', 'Owner_Managing Authority',
-                   'Lat', 'Long', 'LL_Source', 'Site_Notes', 'Category',
-                   'uuid']
+                   'IDENT_Latitude', 'IDENT_Longitude']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
 
@@ -50,17 +45,14 @@ class Command(BaseCommand):
             for entity in region.get_descendants(True):
                 entity_dict = {}
 
-                if entity.extra_data:
-                    entity_dict.update(entity.extra_data)
-
                 entity_dict.update({
                     'IDENT_Code': entity.slug,
                     'IDENT_Name': entity.name,
                     'IDENT_Type': entity.type.slug,
                     'IDENT_ParentCode': getattr(entity.parent, 'slug') or "",
-                    'IDENT_Active': entity.active,
-                    'IDENT_ActiveChangedOn': entity.active_changed_on,
                     'IDENT_ModifiedOn': entity.modified_on,
+                    'IDENT_Latitude': entity.latitude or "",
+                    'IDENT_Longitude': entity.longitude or "",
                 })
 
                 if entity.type.slug == 'health_region':
@@ -71,9 +63,6 @@ class Command(BaseCommand):
                 elif entity.type.slug == 'health_center':
                     entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.slug,
                                         'IDENT_HealthDistricCode': entity.parent.slug})
-
-                if entity.extra_data:
-                    entity_dict.update(entity.extra_data)
 
                 csv_writer.writerow(entity_dict)
                 print(entity.name)

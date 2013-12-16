@@ -29,8 +29,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         headers = ['IDENT_Code', 'IDENT_Name', 'IDENT_Type', 'IDENT_ParentCode',
-                   'IDENT_Active', 'IDENT_ActiveChangedOn', 'IDENT_ModifiedOn',
-                   'IDENT_HealthCenterCode', 'IDENT_HealthCenterName']
+                   'IDENT_ModifiedOn', 'IDENT_RegionName', 'IDENT_CercleName',
+                   'IDENT_CommuneName',
+                   'IDENT_HealthCenterCode', 'IDENT_HealthCenterName',
+                   'IDENT_HealthCenterDistance']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
 
@@ -45,20 +47,34 @@ class Command(BaseCommand):
                 entity = AdministrativeEntity.objects.get(slug=entity.slug)
                 entity_dict = {}
 
+                cercle_name = commune_name = None
+                if entity.type.slug == 'cercle':
+                    cercle_name = entity.name
+
+                if entity.type.slug == 'commune':
+                    cercle_name = entity.parent.name
+                    commune_name = entity.name
+
+                if entity.type.slug == 'vfq':
+                    cercle_name = entity.parent.parent.name
+                    commune_name = entity.parent.name
+
                 entity_dict.update({
                     'IDENT_Code': entity.slug,
                     'IDENT_Name': entity.name,
                     'IDENT_Type': entity.type.slug,
                     'IDENT_ParentCode': getattr(entity.parent, 'slug') or "",
-                    'IDENT_Active': entity.active,
-                    'IDENT_ActiveChangedOn': entity.active_changed_on,
                     'IDENT_ModifiedOn': entity.modified_on,
+                    'IDENT_RegionName': region.name or "",
+                    'IDENT_CercleName': cercle_name or "",
+                    'IDENT_CommuneName': commune_name or ""
                 })
 
                 if entity.health_entity:
                     entity_dict.update({
                         'IDENT_HealthCenterCode': entity.health_entity.slug,
                         'IDENT_HealthCenterName': entity.health_entity.name,
+                        'IDENT_HealthCenterDistance': entity.distance,
                     })
 
                 csv_writer.writerow(entity_dict)

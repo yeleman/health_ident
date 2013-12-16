@@ -15,7 +15,7 @@ if PY2:
 else:
     import csv
 
-from health_ident.models import Entity, AdministrativeEntity, HealthEntity, EntityType
+from health_ident.models import Entity, AdministrativeEntity, HealthEntity, EntityType, EntityHistory
 
 class Command(BaseCommand):
 
@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
         headers = ['cls', 'slug', 'name', 'type_slug', 'parent_slug',
                    'latitude', 'longitude', 'health_center_ID',
-                   'health_center_name', 'district']
+                   'health_center_name', 'district', 'distance']
         input_file = open(options.get('input_file'), 'r')
         csv_reader = csv.DictReader(input_file, fieldnames=headers)
 
@@ -63,12 +63,16 @@ class Command(BaseCommand):
             latitude = entry.get('latitude')
             longitude = entry.get('longitude')
             health_center_id = entry.get('health_center_ID')
+            try:
+                health_center_distance = float(entry.get('distance').strip())
+            except:
+                health_center_distance = None
             if health_center_id:
                 health_center = HealthEntity.objects.get(slug=health_center_id)
             else:
                 health_center = None
 
-            print(name, health_center)
+            print(name, health_center, health_center_distance)
 
             # entity =  cls.objects.get(slug=slug)
 
@@ -84,6 +88,10 @@ class Command(BaseCommand):
 
             if cls == AdministrativeEntity and health_center:
                 entity.health_entity = health_center
+                entity.health_entity_distance = health_center_distance
                 # entity.save()
 
             entity.save()
+
+            if cls == HealthEntity:
+                EntityHistory.objects.create(entity=entity)

@@ -5,14 +5,12 @@
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
 
-import reversion
 from py3compat import implements_to_string
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.utils import timezone
 from mptt.models import MPTTModel, TreeForeignKey
 from mptt.managers import TreeManager
-from picklefield.fields import PickledObjectField
 
 
 def casted_entity(slug):
@@ -57,10 +55,7 @@ class Entity(MPTTModel):
                             verbose_name=_("Parent"))
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
-    active = models.BooleanField(default=True)
-    active_changed_on = models.DateTimeField(default=timezone.now)
     modified_on = models.DateTimeField(default=timezone.now)
-    extra_data = PickledObjectField(null=True, blank=True)
 
     objects = TreeManager()
 
@@ -73,8 +68,7 @@ class Entity(MPTTModel):
                 'type': self.type.slug,
                 'parent': getattr(self.parent, 'slug', None),
                 'latitude': self.latitude,
-                'longitude': self.longitude,
-                'active': self.active}
+                'longitude': self.longitude}
 
     def display_name(self):
         return self.name.title()
@@ -119,7 +113,41 @@ class AdministrativeEntity(Entity):
 
     health_entity = models.ForeignKey(HealthEntity, blank=True, null=True,
                                       related_name=_("admin_entities"))
+    health_entity_distance = models.FloatField(blank=True, null=True)
 
-reversion.register(Entity)
+    @property
+    def distance(self):
+        import math
+        d = self.health_entity_distance
+        if d is None:
+            return None
+        if d == math.floor(d):
+            return int(d)
+        return d
+
+@implements_to_string
+class EntityHistory(models.Model):
+
+    entity = models.ForeignKey(HealthEntity, related_name='active_changes')
+    active = models.BooleanField(default=True)
+    since = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.entity
 
 
+@implements_to_string
+class HealthEntityProperty(models.Model):
+
+    class Meta:
+        app_label = 'health_ident'
+        verbose_name = _("HealthEntity. Property")
+        verbose_name_plural = _("HealthEntity. Properties")
+
+    entity = models.ForeignKey(HealthEntity, related_name='properties')
+    name = models.CharField(max_length=500)
+    value = models.CharField(max_length=500)
+    modified_on = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.name

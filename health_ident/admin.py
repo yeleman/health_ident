@@ -7,7 +7,8 @@ from __future__ import (unicode_literals, absolute_import,
 
 from django.contrib import admin
 
-from health_ident.models import (Entity, HealthEntity, AdministrativeEntity)
+from health_ident.models import (Entity, HealthEntity, AdministrativeEntity,
+                                 HealthEntityProperty, EntityHistory)
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -21,3 +22,5 @@ class EntityAdmin(admin.ModelAdmin):
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(HealthEntity, EntityAdmin)
 admin.site.register(AdministrativeEntity, EntityAdmin)
+admin.site.register(EntityHistory)
+admin.site.register(HealthEntityProperty)
