@@ -4,6 +4,7 @@
 
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
+import json
 
 from py3compat import PY2
 from optparse import make_option
@@ -31,7 +32,7 @@ class Command(BaseCommand):
         headers = ['IDENT_Code', 'IDENT_Name', 'IDENT_Type', 'IDENT_ParentCode',
                    'IDENT_ModifiedOn',
                    'IDENT_HealthRegionCode', 'IDENT_HealthDistricCode',
-                   'IDENT_Latitude', 'IDENT_Longitude']
+                   'IDENT_Latitude', 'IDENT_Longitude', 'IDENT_Geometry']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
 
@@ -45,6 +46,11 @@ class Command(BaseCommand):
             for entity in region.get_descendants(True):
                 entity_dict = {}
 
+                if entity.geometry:
+                    geometry = json.dumps(entity.geojson)
+                else:
+                    geometry = None
+
                 entity_dict.update({
                     'IDENT_Code': entity.slug,
                     'IDENT_Name': entity.name,
@@ -53,6 +59,7 @@ class Command(BaseCommand):
                     'IDENT_ModifiedOn': entity.modified_on,
                     'IDENT_Latitude': entity.latitude or "",
                     'IDENT_Longitude': entity.longitude or "",
+                    'IDENT_Geometry': geometry or "",
                 })
 
                 if entity.type.slug == 'health_region':

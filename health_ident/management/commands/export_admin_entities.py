@@ -4,6 +4,7 @@
 
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
+import json
 
 from py3compat import PY2
 from optparse import make_option
@@ -32,7 +33,8 @@ class Command(BaseCommand):
                    'IDENT_ModifiedOn', 'IDENT_RegionName', 'IDENT_CercleName',
                    'IDENT_CommuneName',
                    'IDENT_HealthCenterCode', 'IDENT_HealthCenterName',
-                   'IDENT_HealthCenterDistance']
+                   'IDENT_HealthCenterDistance',
+                   'IDENT_Latitude', 'IDENT_Longitude', 'IDENT_Geometry']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
 
@@ -46,6 +48,11 @@ class Command(BaseCommand):
             for entity in region.get_descendants(True):
                 entity = AdministrativeEntity.objects.get(slug=entity.slug)
                 entity_dict = {}
+
+                if entity.geometry:
+                    geometry = json.dumps(entity.geojson)
+                else:
+                    geometry = None
 
                 cercle_name = commune_name = None
                 if entity.type.slug == 'cercle':
@@ -67,7 +74,10 @@ class Command(BaseCommand):
                     'IDENT_ModifiedOn': entity.modified_on,
                     'IDENT_RegionName': region.name or "",
                     'IDENT_CercleName': cercle_name or "",
-                    'IDENT_CommuneName': commune_name or ""
+                    'IDENT_CommuneName': commune_name or "",
+                    'IDENT_Latitude': entity.latitude or "",
+                    'IDENT_Longitude': entity.longitude or "",
+                    'IDENT_Geometry': geometry or "",
                 })
 
                 if entity.health_entity:

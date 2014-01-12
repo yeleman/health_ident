@@ -4,6 +4,7 @@
 
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
+import json
 
 from py3compat import implements_to_string
 from django.db import models
@@ -55,12 +56,17 @@ class Entity(MPTTModel):
                             verbose_name=_("Parent"))
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
+    geometry = models.TextField(blank=True, null=True)
     modified_on = models.DateTimeField(default=timezone.now)
 
     objects = TreeManager()
 
     def __str__(self):
         return self.name
+
+    @property
+    def geojson(self):
+        return json.loads(self.geometry)
 
     def to_dict(self):
         return {'slug': self.slug,
