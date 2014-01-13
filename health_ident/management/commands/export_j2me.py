@@ -29,6 +29,9 @@ class Command(BaseCommand):
 
         export_dir = os.path.join(settings.BASE_DIR, 'j2me')
 
+        if not os.path.exists(export_dir):
+            os.mkdir(export_dir)
+
         mali = Entity.objects.get(slug='mali')
 
         print("Exporting Health Entities...")
