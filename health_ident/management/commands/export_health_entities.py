@@ -31,7 +31,8 @@ class Command(BaseCommand):
 
         headers = ['IDENT_Code', 'IDENT_Name', 'IDENT_Type', 'IDENT_ParentCode',
                    'IDENT_ModifiedOn',
-                   'IDENT_HealthRegionCode', 'IDENT_HealthDistricCode',
+                   'IDENT_HealthRegionCode', 'IDENT_HealthDistrictCode',
+                   'IDENT_HealthAreaCode', 'IDENT_MainEntityCode',
                    'IDENT_Latitude', 'IDENT_Longitude', 'IDENT_Geometry']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
@@ -43,7 +44,17 @@ class Command(BaseCommand):
         print("Exporting Health Entities...")
 
         for region in HealthEntity.objects.filter(parent=mali):
-            for entity in region.get_descendants(True):
+            entities_slugs = []
+            entities_slugs.append(region.slug)
+            for district in HealthEntity.objects.filter(type__slug='health_district', parent=region):
+                entities_slugs.append(district.slug)
+                for health_area in HealthEntity.objects.filter(type__slug='health_area', parent=district):
+                    entities_slugs.append(health_area.slug)
+                    for health_center in HealthEntity.objects.filter(type__slug='health_center', parent=health_area):
+                        entities_slugs.append(health_center.slug)
+            # for entity in region.get_descendants(True):
+            for entity_slug in entities_slugs:
+                entity = HealthEntity.objects.get(slug=entity_slug)
                 entity_dict = {}
 
                 if entity.geometry:
@@ -56,6 +67,7 @@ class Command(BaseCommand):
                     'IDENT_Name': entity.name,
                     'IDENT_Type': entity.type.slug,
                     'IDENT_ParentCode': getattr(entity.parent, 'slug') or "",
+                    'IDENT_MainEntityCode': getattr(entity.main_entity, 'slug', "") or "",
                     'IDENT_ModifiedOn': entity.modified_on,
                     'IDENT_Latitude': entity.latitude or "",
                     'IDENT_Longitude': entity.longitude or "",
@@ -66,10 +78,15 @@ class Command(BaseCommand):
                     entity_dict.update({'IDENT_HealthRegionCode': entity.slug})
                 elif entity.type.slug == 'health_district':
                     entity_dict.update({'IDENT_HealthRegionCode': entity.parent.slug,
-                                        'IDENT_HealthDistricCode': entity.slug})
-                elif entity.type.slug == 'health_center':
+                                        'IDENT_HealthDistrictCode': entity.slug})
+                elif entity.type.slug == 'health_area':
                     entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.slug,
-                                        'IDENT_HealthDistricCode': entity.parent.slug})
+                                        'IDENT_HealthDistrictCode': entity.parent.slug,
+                                        'IDENT_HealthAreaCode': entity.slug})
+                elif entity.type.slug == 'health_center':
+                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.parent.slug,
+                                        'IDENT_HealthDistrictCode': entity.parent.parent.slug,
+                                        'IDENT_HealthAreaCode': entity.parent.slug})
 
                 csv_writer.writerow(entity_dict)
                 print(entity.name)

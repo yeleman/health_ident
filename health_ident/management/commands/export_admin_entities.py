@@ -32,8 +32,8 @@ class Command(BaseCommand):
         headers = ['IDENT_Code', 'IDENT_Name', 'IDENT_Type', 'IDENT_ParentCode',
                    'IDENT_ModifiedOn', 'IDENT_RegionName', 'IDENT_CercleName',
                    'IDENT_CommuneName',
-                   'IDENT_HealthCenterCode', 'IDENT_HealthCenterName',
-                   'IDENT_HealthCenterDistance',
+                   'IDENT_HealthAreaCode', 'IDENT_HealthAreaName',
+                   'IDENT_HealthAreaCenterDistance',
                    'IDENT_Latitude', 'IDENT_Longitude', 'IDENT_Geometry']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
@@ -82,9 +82,9 @@ class Command(BaseCommand):
 
                 if entity.health_entity:
                     entity_dict.update({
-                        'IDENT_HealthCenterCode': entity.health_entity.slug,
-                        'IDENT_HealthCenterName': entity.health_entity.name,
-                        'IDENT_HealthCenterDistance': entity.distance,
+                        'IDENT_HealthAreaCode': entity.health_entity.slug,
+                        'IDENT_HealthAreaName': entity.health_entity.name,
+                        'IDENT_HealthAreaCenterDistance': entity.main_entity_distance,
                     })
 
                 csv_writer.writerow(entity_dict)

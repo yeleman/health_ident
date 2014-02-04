@@ -23,6 +23,10 @@ class Command(BaseCommand):
                     help='CSV file to export health_entity_properties to',
                     action='store',
                     dest='input_file'),
+        make_option('-s',
+                    help='Comma-separated list of Region Slugs to include',
+                    action='store',
+                    dest='only_regions'),
     )
 
     def handle(self, *args, **options):
@@ -32,11 +36,14 @@ class Command(BaseCommand):
         if not os.path.exists(export_dir):
             os.mkdir(export_dir)
 
-        mali = Entity.objects.get(slug='mali')
+        if options.get('only_regions'):
+            only_regions = options.get('only_regions').split(',')
+            regions = HealthEntity.objects.filter(slug__in=only_regions)
+        else:
+            mali = Entity.objects.get(slug='mali')
+            regions = HealthEntity.objects.filter(parent=mali)
 
         print("Exporting Health Entities...")
-
-        regions = HealthEntity.objects.filter(parent=mali)
 
         for region in regions:
 

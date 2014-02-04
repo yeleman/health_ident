@@ -73,7 +73,7 @@ def about(request, entity_slug=None):
 def browser(request, entity_slug=None):
     context = {"page": "browser"}
     context.update(csrf(request))
-    health_center = False
+    detailed_view = False
 
     if entity_slug and not entity_slug == 'mali':
         entity = HealthEntity.objects.get(slug=entity_slug)
@@ -83,11 +83,14 @@ def browser(request, entity_slug=None):
     context.update({'entity': entity})
 
     if entity.type.slug == 'health_center':
-        health_center = True
+        detailed_view = True
+
+    if entity.type.slug == 'health_area':
+        detailed_view = True
 
         context.update({'villages': AdministrativeEntity.objects.filter(health_entity=entity)})
 
-    context.update({'health_center': health_center})
+    context.update({'detailed_view': detailed_view})
 
     initial = {
         'message': "Modification de {}/{}".format(entity.name, entity_slug),

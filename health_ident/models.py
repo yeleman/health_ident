@@ -109,6 +109,8 @@ class HealthEntity(Entity):
         verbose_name = _("Health Entity")
         verbose_name_plural = _("Health Entities")
 
+    main_entity = models.ForeignKey('self', blank=True, null=True)
+
 
 class AdministrativeEntity(Entity):
 
@@ -119,7 +121,7 @@ class AdministrativeEntity(Entity):
 
     health_entity = models.ForeignKey(HealthEntity, blank=True, null=True,
                                       related_name=_("admin_entities"))
-    health_entity_distance = models.FloatField(blank=True, null=True)
+    main_entity_distance = models.FloatField(blank=True, null=True)
 
     @property
     def distance(self):

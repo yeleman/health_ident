@@ -9,6 +9,9 @@
     <object pk="country" model="health_ident.entitytype">
         <field type="CharField" name="name">Pays</field>
     </object>
+    <object pk="health_area" model="health_ident.entitytype">
+        <field type="CharField" name="name">Aire de santé</field>
+    </object>
     <object pk="health_center" model="health_ident.entitytype">
         <field type="CharField" name="name">Unité sanitaire</field>
     </object>

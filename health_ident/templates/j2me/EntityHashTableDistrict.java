@@ -18,15 +18,15 @@ public class EntityHashTable{{ district.slug}} extends EntityHashTable {
         this.name = "{{ district.name|safe }}";
         this.children = new Vector();
 
-        {% for cscom in district.get_children %}
-        EntityHashTable h{{ cscom.slug }} = new EntityHashTable("{{ cscom.slug }}", "{{ cscom.name|safe }}");
+        {% for harea in district.get_children %}
+        EntityHashTable h{{ harea.slug }} = new EntityHashTable("{{ harea.slug }}", "{{ harea.name|safe }}");
 
-        {% for village in cscom|villages %}
+        {% for village in harea|villages %}
         EntityHashTable v{{ village.slug }} = new EntityHashTable("{{ village.slug }}", "{{ village.name|safe }}");
-		h{{ cscom.slug }}.children.addElement(v{{ village.slug }});
+		h{{ harea.slug }}.children.addElement(v{{ village.slug }});
        	{% endfor %}
 
-        this.children.addElement(h{{ cscom.slug }});
+        this.children.addElement(h{{ harea.slug }});
         {% endfor %}
     }
 

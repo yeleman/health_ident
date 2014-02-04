@@ -11,7 +11,7 @@
     <li class="active">{{ entity|hnametype }}</li>
 </ol>
 
-{% if not health_center %}
+{% if not detailed_view %}
 <table class="table table-striped table-bordered">
 <thead>
 <legend>Liste des unités sanitaires de {{ entity.name }}</legend>
@@ -26,45 +26,57 @@
 
 {% else %}
 <div class="row">
-
     <div class="col-md-5">
+        {% if entity.type.slug == "health_area" %}
         <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.slug}}</h3>
+        <h4><a href="{% url 'browser_at' entity.main_entity.slug %}">{{ entity.main_entity.slug}} – CSCom de {{ entity.main_entity.name }}</a></h3>
+        {% else %}
+        <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.slug}}{% if entity.type.slug == 'health_area' %}<br />CSCom: <a href="{% url 'browser_at' entity.main_entity.slug %}">{{ entity.main_entity.slug }}</a>{% endif %}</h3>
+        {% endif %}
         <dl>
             <dt>Nom</dt>
             <dd>{{ entity.name }}</dd>
+            {% if entity.type.slug == "health_area" %}
             <dt>District Sanitaire</dt>
-            <dd>{{ entity.parent }}</dd>
+            <dd><a href="{% url 'browser_at' entity.parent.slug %}">{{ entity.parent }} – {{ entity.parent.slug }}</a></dd>
             <dt>Nb de villages</dt>
             <dd>{{ villages|length }} rattaché{{ villages|length|pluralize }}</dd>
+            {% else %}
+            <dt>Aire de Santé</dt>
+            <dd><a href="{% url 'browser_at' entity.parent.slug %}">{{ entity.parent }} – {{ entity.parent.slug }}</a></dd>
+            <dt>District Sanitaire</dt>
+            <dd><a href="{% url 'browser_at' entity.parent.parent.slug %}">{{ entity.parent.parent }} – {{ entity.parent.parent.slug }}</a></dd>
+            {% endif %}
             {% if entity.gps %}
-            <dt>Latitude</dt>
+            <dt>Latitude CSCom</dt>
             <dd>{{ entity.latitude|default_if_none:"" }}</dd>
-            <dt>Longitude</dt>
+            <dt>Longitude CSCom</dt>
             <dd>{{ entity.longitude|default_if_none:"" }}</dd>
             {% endif %}
             <dt>Dernière modification</dt>
             <dd>{{ entity.modified_on }}</dd>
         </dl>
 
-        {% if entity.gps %}<p><a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> Voir sur OpenStreetMap</a></p>{% endif %}
+        {% if entity.main_entity.gps %}<p><a href="http://www.openstreetmap.org/?mlat={{ entity.main_entity.latitude }}&mlon={{ entity.main_entity.longitude }}#map=13/{{ entity.main_entity.latitude}}/{{ entity.main_entity.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> Voir sur OpenStreetMap</a></p>{% endif %}
     </div>
 
     <div class="col-md-7">
         <div id="minimap"></div>
     </div>
 </div>
-
+{% if entity.type.slug == "health_area" %}
 <table class="table table-striped table-bordered">
 <thead>
-<legend>Liste des villages <em>rattachés</em> à {{ entity.name }}</legend>
+<legend>Liste des villages <em>rattachés</em> à l'aire de {{ entity.name }}</legend>
 <tr><th>Code MATCL</th><th>Nom</th><th>Coord. GPS</th><th>Distance CSCom (km)</th></tr>
 </thead>
 <tbody>
 {% for child in villages %}
-<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td><td>{{ child.distance|default_if_none:"n/c" }}</td>
+<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td><td>{{ child.main_entity_distance|default_if_none:"n/c" }}</td>
 {% endfor %}
 </tbody>
 </table>
+{% endif %}
 
 <table class="table table-striped table-condensed table-bordered">
 <legend>Données de l'Unité Sanitaire</legend>
