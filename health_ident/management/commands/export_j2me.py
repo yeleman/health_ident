@@ -4,6 +4,7 @@
 
 from __future__ import (unicode_literals, absolute_import,
                         division, print_function)
+import logging
 import os
 import zipfile
 
@@ -12,7 +13,9 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.template import loader, Context
 
-from health_ident.models import Entity, HealthEntity
+from health_ident.storage import IdentEntity
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -38,10 +41,11 @@ class Command(BaseCommand):
 
         if options.get('only_regions'):
             only_regions = options.get('only_regions').split(',')
-            regions = HealthEntity.objects.filter(slug__in=only_regions)
+            regions = IdentEntity.find({'entity_type': 'health_region',
+                                        'code': {'$in': only_regions}})
         else:
-            mali = Entity.objects.get(slug='mali')
-            regions = HealthEntity.objects.filter(parent=mali)
+            regions = IdentEntity.find({'entity_type': 'health_region',
+                                        'parent_code': 'mali'})
 
         print("Exporting Health Entities...")
 
@@ -52,23 +56,23 @@ class Command(BaseCommand):
                 district_file_content = loader.get_template("j2me/EntityHashTableDistrict.java") \
                                               .render(Context({'district': district}))
 
-                with open(os.path.join(export_dir, "EntityHashTable{}.java".format(district.slug)), 'w') as f:
-                    f.write(district_file_content.encode('utf-8'))
+                with open(os.path.join(export_dir, "EntityHashTable{}.java".format(district.code)), 'w') as f:
+                    f.write(district_file_content)
 
                 print(district.name)
 
         with open(os.path.join(export_dir, "Utils.java"), 'w') as f:
-            f.write(loader.get_template("j2me/Utils.java").render(Context({})).encode('utf-8'))
+            f.write(loader.get_template("j2me/Utils.java").render(Context({})))
 
         with open(os.path.join(export_dir, "EntityHashTable.java"), 'w') as f:
-            f.write(loader.get_template("j2me/EntityHashTable.java").render(Context({})).encode('utf-8'))
+            f.write(loader.get_template("j2me/EntityHashTable.java").render(Context({})))
 
 
         region_file_content = loader.get_template("j2me/StaticCodes.java") \
                                     .render(Context({'regions': regions}))
 
         with open(os.path.join(export_dir, "StaticCodes.java"), 'w') as f:
-            f.write(region_file_content.encode('utf-8'))
+            f.write(region_file_content)
 
         zf = zipfile.ZipFile(options.get('input_file'), mode='w')
         for asset in os.listdir(os.path.join(export_dir)):

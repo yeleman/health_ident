@@ -15,7 +15,8 @@ if PY2:
 else:
     import csv
 
-from health_ident.models import Entity, AdministrativeEntity
+from health_ident.storage import IdentEntity
+
 
 class Command(BaseCommand):
 
@@ -40,13 +41,13 @@ class Command(BaseCommand):
 
         csv_writer.writeheader()
 
-        mali = Entity.objects.get(slug='mali')
+        mali = IdentEntity.get_or_none('mali')
 
         print("Exporting Admin Entities...")
 
-        for region in AdministrativeEntity.objects.filter(parent=mali):
+        for region in IdentEntity.find({'category': 'admin', 'parent_code': 'mali'}):
             for entity in region.get_descendants(True):
-                entity = AdministrativeEntity.objects.get(slug=entity.slug)
+                entity = IdentEntity.get_or_none(entity.code)
                 entity_dict = {}
 
                 if entity.geometry:
@@ -55,23 +56,23 @@ class Command(BaseCommand):
                     geometry = None
 
                 cercle_name = commune_name = None
-                if entity.type.slug == 'cercle':
+                if entity.entity_type == 'cercle':
                     cercle_name = entity.name
 
-                if entity.type.slug == 'commune':
+                if entity.entity_type == 'commune':
                     cercle_name = entity.parent.name
                     commune_name = entity.name
 
-                if entity.type.slug == 'vfq':
+                if entity.entity_type == 'vfq':
                     cercle_name = entity.parent.parent.name
                     commune_name = entity.parent.name
 
                 entity_dict.update({
-                    'IDENT_Code': entity.slug,
+                    'IDENT_Code': entity.code,
                     'IDENT_Name': entity.name,
-                    'IDENT_Type': entity.type.slug,
-                    'IDENT_ParentCode': getattr(entity.parent, 'slug') or "",
-                    'IDENT_ModifiedOn': entity.modified_on,
+                    'IDENT_Type': entity.entity_type,
+                    'IDENT_ParentCode': entity.parent_code,
+                    'IDENT_ModifiedOn': entity.modified_on.isoformat(),
                     'IDENT_RegionName': region.name or "",
                     'IDENT_CercleName': cercle_name or "",
                     'IDENT_CommuneName': commune_name or "",
@@ -82,7 +83,7 @@ class Command(BaseCommand):
 
                 if entity.health_entity:
                     entity_dict.update({
-                        'IDENT_HealthAreaCode': entity.health_entity.slug,
+                        'IDENT_HealthAreaCode': entity.health_entity_code,
                         'IDENT_HealthAreaName': entity.health_entity.name,
                         'IDENT_HealthAreaCenterDistance': entity.main_entity_distance,
                     })

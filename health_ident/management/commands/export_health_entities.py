@@ -15,7 +15,8 @@ if PY2:
 else:
     import csv
 
-from health_ident.models import HealthEntity, Entity
+from health_ident.storage import IdentEntity
+
 
 class Command(BaseCommand):
 
@@ -39,54 +40,54 @@ class Command(BaseCommand):
 
         csv_writer.writeheader()
 
-        mali = Entity.objects.get(slug='mali')
+        mali = IdentEntity.get_or_none('mali')
 
         print("Exporting Health Entities...")
 
-        for region in HealthEntity.objects.filter(parent=mali):
+        for region in IdentEntity.find({'parent_code': 'mali'}):
             entities_slugs = []
-            entities_slugs.append(region.slug)
-            for district in HealthEntity.objects.filter(type__slug='health_district', parent=region):
-                entities_slugs.append(district.slug)
-                for health_area in HealthEntity.objects.filter(type__slug='health_area', parent=district):
-                    entities_slugs.append(health_area.slug)
-                    for health_center in HealthEntity.objects.filter(type__slug='health_center', parent=health_area):
-                        entities_slugs.append(health_center.slug)
+            entities_slugs.append(region.code)
+            for district in IdentEntity.find({'entity_type': 'health_district', 'parent_code': region.code}):
+                entities_slugs.append(district.code)
+                for health_area in IdentEntity.find({'entity_type': 'health_area', 'parent_code': 'district'}):
+                    entities_slugs.append(health_area.code)
+                    for health_center in IdentEntity.find({'entity_type': 'health_center', 'parent_code': 'health_area'}):
+                        entities_slugs.append(health_center.code)
             # for entity in region.get_descendants(True):
             for entity_slug in entities_slugs:
-                entity = HealthEntity.objects.get(slug=entity_slug)
+                entity = IdentEntity.get_or_none(entity_slug)
                 entity_dict = {}
 
                 if entity.geometry:
-                    geometry = json.dumps(entity.geojson)
+                    geometry = entity.geojson
                 else:
                     geometry = None
 
                 entity_dict.update({
-                    'IDENT_Code': entity.slug,
+                    'IDENT_Code': entity.code,
                     'IDENT_Name': entity.name,
-                    'IDENT_Type': entity.type.slug,
-                    'IDENT_ParentCode': getattr(entity.parent, 'slug') or "",
-                    'IDENT_MainEntityCode': getattr(entity.main_entity, 'slug', "") or "",
-                    'IDENT_ModifiedOn': entity.modified_on,
+                    'IDENT_Type': entity.entity_type,
+                    'IDENT_ParentCode': entity.parent_code,
+                    'IDENT_MainEntityCode': entity.main_entity_code,
+                    'IDENT_ModifiedOn': entity.modified_on.isoformat(),
                     'IDENT_Latitude': entity.latitude or "",
                     'IDENT_Longitude': entity.longitude or "",
                     'IDENT_Geometry': geometry or "",
                 })
 
-                if entity.type.slug == 'health_region':
-                    entity_dict.update({'IDENT_HealthRegionCode': entity.slug})
-                elif entity.type.slug == 'health_district':
-                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.slug,
-                                        'IDENT_HealthDistrictCode': entity.slug})
-                elif entity.type.slug == 'health_area':
-                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.slug,
-                                        'IDENT_HealthDistrictCode': entity.parent.slug,
-                                        'IDENT_HealthAreaCode': entity.slug})
-                elif entity.type.slug == 'health_center':
-                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.parent.slug,
-                                        'IDENT_HealthDistrictCode': entity.parent.parent.slug,
-                                        'IDENT_HealthAreaCode': entity.parent.slug})
+                if entity.entity_type == 'health_region':
+                    entity_dict.update({'IDENT_HealthRegionCode': entity.code})
+                elif entity.entity_type == 'health_district':
+                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.code,
+                                        'IDENT_HealthDistrictCode': entity.code})
+                elif entity.entity_type == 'health_area':
+                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.code,
+                                        'IDENT_HealthDistrictCode': entity.parent.code,
+                                        'IDENT_HealthAreaCode': entity.code})
+                elif entity.entity_type == 'health_center':
+                    entity_dict.update({'IDENT_HealthRegionCode': entity.parent.parent.parent.code,
+                                        'IDENT_HealthDistrictCode': entity.parent.parent.code,
+                                        'IDENT_HealthAreaCode': entity.parent.code})
 
                 csv_writer.writerow(entity_dict)
                 print(entity.name)

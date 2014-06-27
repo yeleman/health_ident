@@ -14,7 +14,8 @@ if PY2:
 else:
     import csv
 
-from health_ident.models import EntityHistory
+from health_ident.storage import IdentEntity
+
 
 class Command(BaseCommand):
 
@@ -37,16 +38,20 @@ class Command(BaseCommand):
         print("Exporting Health Entity Properties...")
 
 
-        for health_history in EntityHistory.objects.all():
-            history_dict = {}
+        for entity in IdentEntity.find():
+            if not len(entity.history):
+                continue
 
-            history_dict.update({
-                'IDENT_Code': health_history.entity.slug,
-                'IDENT_IsActive': health_history.active,
-                'IDENT_Since': health_history.since,
-            })
+            for history in entity.history:
+                history_dict = {}
 
-            csv_writer.writerow(history_dict)
-            print(health_history.entity.name)
+                history_dict.update({
+                    'IDENT_Code': entity.code,
+                    'IDENT_IsActive': history.get('active'),
+                    'IDENT_Since': history.get('since').isoformat(),
+                })
+
+                csv_writer.writerow(history_dict)
+                print(entity.name)
 
         input_file.close()

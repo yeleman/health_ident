@@ -18,6 +18,7 @@ from django.contrib.sites.models import Site
 
 from health_ident import get_last_export
 from health_ident.models import HealthEntity, Entity, AdministrativeEntity
+from health_ident.storage import IdentEntity
 
 
 class ContactForm(forms.Form):
@@ -54,18 +55,15 @@ def about(request, entity_slug=None):
                      'all_entities_file': output_file,
                      'all_entities_sql': output_sql}))
 
-    all_admin = AdministrativeEntity.objects.all()
-    all_health = HealthEntity.objects.all()
-
     context.update({
-        'nb_cscom_total': all_health.filter(type__slug='health_center').count(),
-        'nb_district_total': all_health.filter(type__slug='health_district').count(),
-        'nb_village_total': all_admin.filter(type__slug='vfq').count(),
-        'nb_commune_total': all_admin.filter(type__slug='commune').count(),
-        'nb_cercle_total': all_admin.filter(type__slug='cercle').count(),
-        'nb_village_alone': all_admin.filter(type__slug='vfq', health_entity__isnull=True).count(),
-        'nb_village_nocoord': all_admin.filter(type__slug='vfq', latitude__isnull=True).count(),
-        'nb_cscom_nocoord': all_health.filter(type__slug='health_center', latitude__isnull=True).count()
+        'nb_cscom_total': IdentEntity.find({'entity_type': 'health_center'}).count(),
+        'nb_district_total': IdentEntity.find({'entity_type': 'health_district'}).count(),
+        'nb_village_total': IdentEntity.find({'entity_type': 'vfq'}).count(),
+        'nb_commune_total': IdentEntity.find({'entity_type': 'commune'}).count(),
+        'nb_cercle_total': IdentEntity.find({'entity_type': 'cercle'}).count(),
+        'nb_village_alone': IdentEntity.find({'entity_type': 'vfq', 'health_entity_code': ''}).count(),
+        'nb_village_nocoord': IdentEntity.find({'entity_type': 'vfq', 'latitude': None}).count(),
+        'nb_cscom_nocoord': IdentEntity.find({'entity_type': 'health_center', 'latitude': None}).count()
         })
     return render(request, "about.html", context)
 
@@ -75,26 +73,26 @@ def browser(request, entity_slug=None):
     context.update(csrf(request))
     detailed_view = False
 
-    if entity_slug and not entity_slug == 'mali':
-        entity = HealthEntity.objects.get(slug=entity_slug)
-    else:
-        entity = Entity.objects.get(slug="mali")
+    if not entity_slug:
+        entity_slug = 'mali'
+
+    entity = IdentEntity.get_or_none(entity_slug)
 
     context.update({'entity': entity})
 
-    if entity.type.slug == 'health_center':
+    if entity.entity_type == 'health_center':
         detailed_view = True
 
-    if entity.type.slug == 'health_area':
+    if entity.entity_type == 'health_area':
         detailed_view = True
 
-        context.update({'villages': AdministrativeEntity.objects.filter(health_entity=entity)})
+        context.update({'villages': IdentEntity.find({'health_entity_code': entity.code})})
 
     context.update({'detailed_view': detailed_view})
 
     initial = {
         'message': "Modification de {}/{}".format(entity.name, entity_slug),
-        'entity_slug': entity.slug}
+        'entity_slug': entity.code}
 
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -116,10 +114,15 @@ def browser(request, entity_slug=None):
 
 def map(request):
     context = {"page": "map"}
-    health_entities = HealthEntity.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True).filter(type__slug='health_center')
+
+    query = {'entity_type': 'health_center',
+             'latitude': {'$ne': None},
+             'longitude': {'$ne': None}}
+
+    health_entities = IdentEntity.find(query)
     context.update({'health_entities': health_entities,
-                    'nb_centers_total': HealthEntity.objects.filter(type__slug='health_center').count(),
-                    'nb_centers_nocoords': HealthEntity.objects.filter(type__slug='health_center', longitude__isnull=True, latitude__isnull=True).count(),})
+                    'nb_centers_total': IdentEntity.find({'entity_type': 'health_center'}).count(),
+                    'nb_centers_nocoords': IdentEntity.find({'entity_type': 'health_center', 'latitude': None}).count()})
 
     return render(request, "map.html", context)
 

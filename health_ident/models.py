@@ -66,6 +66,8 @@ class Entity(MPTTModel):
 
     @property
     def geojson(self):
+        if self.geometry is None:
+            return None
         return json.loads(self.geometry)
 
     def to_dict(self):

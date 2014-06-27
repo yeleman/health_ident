@@ -14,7 +14,8 @@ if PY2:
 else:
     import csv
 
-from health_ident.models import HealthEntityProperty
+from health_ident.storage import IdentEntity
+
 
 class Command(BaseCommand):
 
@@ -28,7 +29,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        headers = ['IDENT_Code', 'IDENT_PropertyName',
+        headers = ['IDENT_Code', 'IDENT_Namespace', 'IDENT_PropertyName',
                    'IDENT_PropertyValue', 'IDENT_PropertyModifiedOn']
         input_file = open(options.get('input_file'), 'w')
         csv_writer = csv.DictWriter(input_file, headers)
@@ -38,17 +39,23 @@ class Command(BaseCommand):
         print("Exporting Health Entity Properties...")
 
 
-        for health_property in HealthEntityProperty.objects.all():
-            property_dict = {}
+        for entity in IdentEntity.find():
 
-            property_dict.update({
-                'IDENT_Code': health_property.entity.slug,
-                'IDENT_PropertyName': health_property.name,
-                'IDENT_PropertyValue': health_property.value,
-                'IDENT_PropertyModifiedOn': health_property.modified_on,
-            })
+            for ns, nsdict in entity.properties.items():
 
-            csv_writer.writerow(property_dict)
-            print(health_property.entity.name)
+                for prop_name, prop_dict in nsdict.items():
+
+                    property_dict = {}
+
+                    property_dict.update({
+                        'IDENT_Code': entity.code,
+                        'IDENT_Namespace': ns,
+                        'IDENT_PropertyName': prop_name,
+                        'IDENT_PropertyValue': prop_dict.get('value'),
+                        'IDENT_PropertyModifiedOn': prop_dict.get('modified_on').isoformat(),
+                    })
+
+                    csv_writer.writerow(property_dict)
+                    print(entity.name)
 
         input_file.close()

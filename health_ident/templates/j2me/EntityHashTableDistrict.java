@@ -11,22 +11,22 @@ import snisi.entities.EntityHashTable;
  */
 
 
-public class EntityHashTable{{ district.slug}} extends EntityHashTable {
+public class EntityHashTable{{ district.code}} extends EntityHashTable {
 
-    public EntityHashTable{{ district.slug}}() {
-        this.code = "{{ district.slug }}";
+    public EntityHashTable{{ district.code}}() {
+        this.code = "{{ district.code }}";
         this.name = "{{ district.name|safe }}";
         this.children = new Vector();
 
         {% for harea in district.get_children %}
-        EntityHashTable h{{ harea.slug }} = new EntityHashTable("{{ harea.slug }}", "{{ harea.name|safe }}");
+        EntityHashTable h{{ harea.code }} = new EntityHashTable("{{ harea.code }}", "{{ harea.name|safe }}");
 
         {% for village in harea|villages %}
-        EntityHashTable v{{ village.slug }} = new EntityHashTable("{{ village.slug }}", "{{ village.name|safe }}");
-		h{{ harea.slug }}.children.addElement(v{{ village.slug }});
+        EntityHashTable v{{ village.code }} = new EntityHashTable("{{ village.code }}", "{{ village.name|safe }}");
+		h{{ harea.code }}.children.addElement(v{{ village.code }});
        	{% endfor %}
 
-        this.children.addElement(h{{ harea.slug }});
+        this.children.addElement(h{{ harea.code }});
         {% endfor %}
     }
 

@@ -2,11 +2,11 @@
 {% load ident %}
 
 {% block content %}
-<h2>{{ entity|hnametype }}  {{ entity.slug }}</h2>
+<h2>{{ entity|hnametype }}  {{ entity.code }}</h2>
 
 <ol class="breadcrumb">
 {% for child in entity.get_ancestors %}
-    <li><a href="{% url 'browser_at' child.slug %}">{{ child|hnametype }}</a></li>
+    <li><a href="{% url 'browser_at' child.code %}">{{ child|hnametype }}</a></li>
 {% endfor %}
     <li class="active">{{ entity|hnametype }}</li>
 </ol>
@@ -19,7 +19,7 @@
 </thead>
 <tbody>
 {% for child in entity.get_children|hentities %}
-<tr><td><a href="{% url 'browser_at' child.slug %}">{{ child.slug}}</a></td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td>
+<tr><td><a href="{% url 'browser_at' child.code %}">{{ child.code}}</a></td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td>
 {% endfor %}
 </tbody>
 </table>
@@ -27,25 +27,25 @@
 {% else %}
 <div class="row">
     <div class="col-md-5">
-        {% if entity.type.slug == "health_area" %}
-        <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.slug}}</h3>
-        <h4><a href="{% url 'browser_at' entity.main_entity.slug %}">{{ entity.main_entity.slug}} – CSCom de {{ entity.main_entity.name }}</a></h3>
+        {% if entity.entity_type == "health_area" %}
+        <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.code}}</h3>
+        <h4><a href="{% url 'browser_at' entity.main_entity.code %}">{{ entity.main_entity.code}} – CSCom de {{ entity.main_entity.name }}</a></h3>
         {% else %}
-        <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.slug}}{% if entity.type.slug == 'health_area' %}<br />CSCom: <a href="{% url 'browser_at' entity.main_entity.slug %}">{{ entity.main_entity.slug }}</a>{% endif %}</h3>
+        <h3><i class="glyphicon glyphicon-barcode"></i> {{ entity.code}}{% if entity.entity_type == 'health_area' %}<br />CSCom: <a href="{% url 'browser_at' entity.main_entity.code %}">{{ entity.main_entity.code }}</a>{% endif %}</h3>
         {% endif %}
         <dl>
             <dt>Nom</dt>
             <dd>{{ entity.name }}</dd>
-            {% if entity.type.slug == "health_area" %}
+            {% if entity.entity_type == "health_area" %}
             <dt>District Sanitaire</dt>
-            <dd><a href="{% url 'browser_at' entity.parent.slug %}">{{ entity.parent }} – {{ entity.parent.slug }}</a></dd>
+            <dd><a href="{% url 'browser_at' entity.parent.code %}">{{ entity.parent }} – {{ entity.parent.code }}</a></dd>
             <dt>Nb de villages</dt>
             <dd>{{ villages|length }} rattaché{{ villages|length|pluralize }}</dd>
             {% else %}
             <dt>Aire de Santé</dt>
-            <dd><a href="{% url 'browser_at' entity.parent.slug %}">{{ entity.parent }} – {{ entity.parent.slug }}</a></dd>
+            <dd><a href="{% url 'browser_at' entity.parent.code %}">{{ entity.parent }} – {{ entity.parent.code }}</a></dd>
             <dt>District Sanitaire</dt>
-            <dd><a href="{% url 'browser_at' entity.parent.parent.slug %}">{{ entity.parent.parent }} – {{ entity.parent.parent.slug }}</a></dd>
+            <dd><a href="{% url 'browser_at' entity.parent.parent.code %}">{{ entity.parent.parent }} – {{ entity.parent.parent.code }}</a></dd>
             {% endif %}
             {% if entity.gps %}
             <dt>Latitude CSCom</dt>
@@ -64,7 +64,7 @@
         <div id="minimap"></div>
     </div>
 </div>
-{% if entity.type.slug == "health_area" %}
+{% if entity.entity_type == "health_area" %}
 <table class="table table-striped table-bordered">
 <thead>
 <legend>Liste des villages <em>rattachés</em> à l'aire de {{ entity.name }}</legend>
@@ -72,20 +72,22 @@
 </thead>
 <tbody>
 {% for child in villages %}
-<tr><td>{{ child.slug}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td><td>{{ child.main_entity_distance|default_if_none:"n/c" }}</td>
+<tr><td>{{ child.code}}</td><td>{{ child.name }}</td><td>{% if child.gps %}<a href="http://www.openstreetmap.org/?mlat={{ child.latitude }}&mlon={{ child.longitude }}#map=13/{{ child.latitude}}/{{ child.longitude }}" title="Voir sur OpenStreetMap"><i class="glyphicon glyphicon-globe"></i> {{ child.gps }}</a>{% else %}n/c{% endif %}</td><td>{{ child.main_entity_distance|default_if_none:"n/c" }}</td>
 {% endfor %}
 </tbody>
 </table>
 {% endif %}
 
+{% for namespace, nsdata in entity.properties.items %}
 <table class="table table-striped table-condensed table-bordered">
-<legend>Données de l'Unité Sanitaire</legend>
+<legend>Données de l'Unité Sanitaire{% if namespace != 'default' %}: <strong>{{ namespace }}</strong>{% endif %}</legend>
 <tbody>
-{% for prop in entity.properties.all %}
-<tr><th>{{ prop.name }}</th><td>{{ prop.value }}</td></tr>
+{% for propname, propdata in nsdata.items %}
+<tr><th>{{ propname }}</th><td>{{ propdata.value }}</td><td>{{ propdata.modified_on }}</td></tr>
 {% endfor %}
 </tbody>
 </table>
+{% endfor %}
 {% endif %}
 
 {% include "contact.html" %}
