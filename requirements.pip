@@ -1,8 +1,10 @@
-Django==1.6
+Django==1.6.5
 django-mptt==0.6.0
 django-picklefield==0.3.0
-py3compat==0.2
+py3compat
 django-reversion
-unicodecsv
-envoy
-csvkit
+#unicodecsv
+#envoy
+git://github.com/kennethreitz/envoy.git#egg=envoy
+pymongo
+manga
