@@ -68,7 +68,7 @@ def about(request, entity_slug=None):
     return render(request, "about.html", context)
 
 
-def browser(request, entity_slug=None):
+def browser(request, entity_slug=None, **kwargs):
     context = {"page": "browser"}
     context.update(csrf(request))
     detailed_view = False
@@ -109,7 +109,7 @@ def browser(request, entity_slug=None):
         form = ContactForm(initial=initial)
     context.update({'form': form})
 
-    return render(request, "browser.html", context)
+    return render(request, kwargs.get('template_name', 'browser.html'), context)
 
 
 def map(request):

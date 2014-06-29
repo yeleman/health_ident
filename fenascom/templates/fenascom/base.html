@@ -1,0 +1,78 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <link id="page_favicon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB4ElEQVQ4jc3TPWgTcRzG8R+IhNODQMh5TWnSxLtem5oobQiJQaE4ZKlxMfGPxJaIiKIEX5D6QoKhECmuvrUWCg4ugosIUjMIhTaLixQ5oblK8YVaD3wh1RYSHofInf86FRcf+KzP9iX6Hya4QzsPyhsM7HNz9soyJ+FuGyQigaRdgfTIi/sozz1EudrybmUMzXqJs14bhVkes6yMXEVCakuTFPKz4swUCn8wlkfRrF/hrOvXYBZL+Fy43lIsIS7JjFwhPztXuYN85ZZl4cNFNL+f5qzNn8Gn/AXb+UuISxIjV9DLck9vIvvkhuX1Ug7Nb2nOz5dH8DE7bDt+EnGXi5Ez6GWpxwUkH122vHqbQuPLAOdH9QDeJwdthw7/PtDaWezBWXRP5izVN3vQMDs5qxUFi91hW2w/ok4nI1FrZ31Tp6COD7VMDGFOD6FhdnBWn3diUe219cUQFZ2MBE1m4ckTCIxnLbN6EA3Tw6lPd8AIaJZaqB9RUWQkKDLrmcjBd/eoZVbX0DB3cOrTHhg+FYZPgeFTUAvuRlQQGQmKxNTbx9B1b9gyMx/G2rKX8/WZHwtdvRZdDaJfEBgRkcehSPmNEnEHJ+IQ/kJEHopEIluTyeT2zUqlUtsymcyWfy7xF31HrKJlwiSaAAAAAElFTkSuQmCC" rel="icon" type="image/x-icon">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Carte Sanitaire Numérique - FENASCOM</title>
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
+
+         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+        <script src='http://api.tiles.mapbox.com/mapbox.js/v1.5.1/mapbox.js'></script>
+        <link href='http://api.tiles.mapbox.com/mapbox.js/v1.5.1/mapbox.css' rel='stylesheet' />
+
+        <script src='http://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
+        <link href='http://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
+        <link href='http://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
+
+        <link href='http://192.168.5.112:8000/static/css/map_alone_all.css' rel='stylesheet' />
+
+        <style type="text/css">
+
+        #map {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            }
+
+        #minimap {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+            }
+
+        header {
+            height: 132px;
+            background-color: #79c74f;
+            background-image: url("{% static 'fenascom_banner.jpg' %}");
+            background-position: top center;
+            background-repeat: no-repeat;
+
+            border-color: rgb(231, 231, 231);
+            box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.15) inset, 0px 1px 5px rgba(0, 0, 0, 0.075);
+            border: 1px solid transparent;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin-bottom: 1em;
+        }
+        </style>
+    </head>
+    <body class="{{ page }}">
+
+        <div class="container">
+            <header></header>
+
+            <nav class="navbar navbar-default" role="navigation">
+
+
+              <!-- Collect the nav links, forms, and other content for toggling -->
+              <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                  <li{% if page = "about" %} class="active"{% endif %}><a href="{% url 'fenascom_about' %}">À propos</a></li>
+                  <li{% if page = "browser" %} class="active"{% endif %}><a href="{% url 'fenascom_browser' %}">Parcourir</a></li>
+                  <li{% if page = "map" %} class="active"{% endif %}><a href="{% url 'fenascom_map' %}">Cartographie Vaccination</a></li>
+                </ul>
+              </div><!-- /.navbar-collapse -->
+            </nav>
+
+            <div class="content">
+            {% block content %}{% endblock %}
+            </div>
+        </div>
+    </body>
+</html>

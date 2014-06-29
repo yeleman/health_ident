@@ -1,0 +1,16 @@
+<table class="table table-striped table-condensed table-bordered">
+<legend>Ressources Humaines de {{ entity.display_code_name }}</legend>
+<tbody>
+<tr><th>ID</th><th>Prenom</th><th>Nom</th><th>Poste</th><th>Sexe</th><th>Age</th></tr>
+{% for rhid, rhdata in entity.properties.fenascom_rh.items %}
+<tr>
+    <td>{{ rhid }}</td>
+    <td>{{ rhdata.Prenom }}</td>
+    <td>{{ rhdata.Nom }}</td>
+    <td>{{ rhdata.Poste }}</td>
+    <td>{{ rhdata.Sexe }}</td>
+    <td>{{ rhdata.Age }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>

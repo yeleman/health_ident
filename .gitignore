@@ -2,3 +2,11 @@
 *.pot
 *.pyc
 settings_local.py
+*.db
+*.csv
+*.sqlite3
+*.zip
+*.sqlite
+*.sql
+.DS_Store
+*.bz2

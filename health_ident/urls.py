@@ -3,6 +3,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.http import HttpResponse
 
+from fenascom import urls as fenascom_urls
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -13,4 +15,5 @@ urlpatterns = patterns('',
     url(r'^browse/?$', 'health_ident.views.browser', name='browser'),
     url(r'^map/?$', 'health_ident.views.map', name='map'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^fenascom/', include(fenascom_urls)),
 )
