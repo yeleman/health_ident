@@ -38,7 +38,7 @@ def about(request, entity_slug=None):
 
     last_export_date = get_last_export()
     suffix = last_export_date.strftime("%Y-%m-%d")
-    output_file = "all_entities-{}.sqlite".format(suffix)
+    output_file = "all_entities-{}.json.bz2".format(suffix)
     output_sql = "all_entities-{}.sql".format(suffix)
     health_file = "health_entities-{}.csv".format(suffix)
     health_properties_file = "health_properties-{}.csv".format(suffix)

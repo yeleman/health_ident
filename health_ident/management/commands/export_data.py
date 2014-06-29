@@ -43,8 +43,8 @@ class Command(BaseCommand):
 
         today = datetime.date.today()
         suffix = today.strftime("%Y-%m-%d")
-        output_file = os.path.join(export_dir, "all_entities-{0}.sqlite".format(suffix))
-        output_sql = os.path.join(export_dir, "all_entities-{0}.sql".format(suffix))
+        output_file = os.path.join(export_dir, "all_entities-{0}.json".format(suffix))
+        # output_sql = os.path.join(export_dir, "all_entities-{0}.sql".format(suffix))
         health_file = os.path.join(export_dir, "health_entities-{0}.csv".format(suffix))
         health_properties_file = os.path.join(export_dir, "health_properties-{0}.csv".format(suffix))
         health_history_file = os.path.join(export_dir, "health_history-{0}.csv".format(suffix))
@@ -79,9 +79,20 @@ class Command(BaseCommand):
         cmd = "csvsql --table 'health_history' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_history_file)
         envoy.run(cmd.encode('utf-8'))
 
-        print("Dumping SQLite into an SQL file")
-        cmd = "sqlite3 {0} .dump {1}".format(output_file, output_sql)
-        envoy.run(cmd.encode('utf-8'))
+        # print("Dumping SQLite into an SQL file")
+        # cmd = "sqlite3 {0} .dump {1}".format(output_file, output_sql)
+        # envoy.run(cmd)
+
+        print("Exporting mongo into JSON")
+        # cmd = "sqlite3 {0} .dump {1}".format(output_file, output_sql)
+        cmd = "mongoexport -d health_ident --jsonArray -c idententity -o tmp_{}".format(output_file)
+        envoy.run(cmd)
+        # pretty print
+        cmd = "python -m json.tool tmp_{0} {0}".format(output_file)
+        envoy.run(cmd)
+        # bzip2
+        cmd = "bzip2 -9 -k {0}".format(output_file)
+        envoy.run(cmd)
 
         print("Exporting J2ME Kit")
         call_command("export_j2me", input_file=j2me_file)
