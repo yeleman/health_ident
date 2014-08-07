@@ -63,28 +63,7 @@ class Command(BaseCommand):
         print("Exporting Health Entity History")
         call_command("export_health_entity_history", input_file=health_history_file)
 
-        print("Exporting Health Entities into SQLite")
-        cmd = "csvsql --table 'health_entities' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_file)
-        envoy.run(cmd.encode('utf-8'))
-
-        print("Exporting Admin Entities into SQLite")
-        cmd = "csvsql --table 'admin_entities' --insert --db 'sqlite:///{0}' {1}".format(output_file, admin_file)
-        envoy.run(cmd.encode('utf-8'))
-
-        print("Exporting Health Entity Properties into SQLite")
-        cmd = "csvsql --table 'health_properties' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_properties_file)
-        envoy.run(cmd.encode('utf-8'))
-
-        print("Exporting Health Entity History into SQLite")
-        cmd = "csvsql --table 'health_history' --insert --db 'sqlite:///{0}' {1}".format(output_file, health_history_file)
-        envoy.run(cmd.encode('utf-8'))
-
-        # print("Dumping SQLite into an SQL file")
-        # cmd = "sqlite3 {0} .dump {1}".format(output_file, output_sql)
-        # envoy.run(cmd)
-
         print("Exporting mongo into JSON")
-        # cmd = "sqlite3 {0} .dump {1}".format(output_file, output_sql)
         cmd = "mongoexport -d health_ident --jsonArray -c idententity -o tmp_{}".format(output_file)
         envoy.run(cmd)
         # pretty print
