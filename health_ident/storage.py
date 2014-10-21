@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 manga.setup('health_ident')
 
-SLUG_LEN = (4,12)
+SLUG_LEN = (4, 12)
+
 
 class IdentEntity(manga.Model):
 
@@ -24,6 +25,7 @@ class IdentEntity(manga.Model):
         'health_district': "District",
         'health_area': "Aire Sanitaire",
         'health_center': "Unité Sanitaire",
+        'private': "Privé",
         'asaco': "ASACO",
         'felascom': "FELASCOM",
         'ferascom': "FERASCOM",
@@ -100,7 +102,7 @@ class IdentEntity(manga.Model):
         def recurs(e):
             d = []
             for child in e.get_children():
-                d += [child,]
+                d += [child]
                 d += recurs(child)
             return d
         s = [self] if include_self else []
@@ -124,4 +126,3 @@ class IdentEntity(manga.Model):
     def gps(self):
         if self.latitude is not None and self.longitude is not None:
             return "{lat},{lon}".format(lat=self.latitude, lon=self.longitude)
-

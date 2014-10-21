@@ -5,6 +5,7 @@ py3compat
 django-reversion
 #unicodecsv
 #envoy
-git://github.com/kennethreitz/envoy.git#egg=envoy
+git+git://github.com/kennethreitz/envoy.git#egg=envoy
+mongo
 pymongo
 manga
