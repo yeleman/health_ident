@@ -36,19 +36,26 @@ class Command(BaseCommand):
                                                last_export.day)
             last_export_dt = timezone.make_aware(last_export_dt, timezone.utc)
 
-        if not last_export is None \
-            and Entity.objects.order_by('-modified_on').last().modified_on <= last_export_dt:
+        if last_export is not None \
+                and Entity.objects.order_by('-modified_on') \
+                .last().modified_on <= last_export_dt:
             print("No modification")
             return 0
 
         today = datetime.date.today()
         suffix = today.strftime("%Y-%m-%d")
-        output_file = os.path.join(export_dir, "all_entities-{0}.json".format(suffix))
-        # output_sql = os.path.join(export_dir, "all_entities-{0}.sql".format(suffix))
-        health_file = os.path.join(export_dir, "health_entities-{0}.csv".format(suffix))
-        health_properties_file = os.path.join(export_dir, "health_properties-{0}.csv".format(suffix))
-        health_history_file = os.path.join(export_dir, "health_history-{0}.csv".format(suffix))
-        admin_file = os.path.join(export_dir, "admin_entities-{0}.csv".format(suffix))
+        output_file = os.path.join(export_dir,
+                                   "all_entities-{0}.json".format(suffix))
+        health_file = os.path.join(export_dir,
+                                   "health_entities-{0}.csv".format(suffix))
+        health_properties_file = os.path.join(export_dir,
+                                              "health_properties-{0}.csv"
+                                              .format(suffix))
+        health_history_file = os.path.join(export_dir,
+                                           "health_history-{0}.csv"
+                                           .format(suffix))
+        admin_file = os.path.join(export_dir,
+                                  "admin_entities-{0}.csv".format(suffix))
         j2me_file = os.path.join(export_dir, "j2me_csn-{0}.zip".format(suffix))
 
         print("Exporting Health Entities")
@@ -58,13 +65,16 @@ class Command(BaseCommand):
         call_command("export_admin_entities", input_file=admin_file)
 
         print("Exporting Health Entity Properties")
-        call_command("export_health_entity_properties", input_file=health_properties_file)
+        call_command("export_health_entity_properties",
+                     input_file=health_properties_file)
 
         print("Exporting Health Entity History")
-        call_command("export_health_entity_history", input_file=health_history_file)
+        call_command("export_health_entity_history",
+                     input_file=health_history_file)
 
         print("Exporting mongo into JSON")
-        cmd = "mongoexport -d health_ident --jsonArray -c idententity -o tmp_{}".format(output_file)
+        cmd = ("mongoexport -d health_ident --jsonArray "
+               "-c idententity -o tmp_{}").format(output_file)
         envoy.run(cmd)
         # pretty print
         cmd = "python -m json.tool tmp_{0} {0}".format(output_file)

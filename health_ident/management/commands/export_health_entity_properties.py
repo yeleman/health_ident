@@ -38,7 +38,6 @@ class Command(BaseCommand):
 
         print("Exporting Health Entity Properties...")
 
-
         for entity in IdentEntity.find():
 
             for ns, nsdict in entity.properties.items():
@@ -47,12 +46,14 @@ class Command(BaseCommand):
 
                     property_dict = {}
 
+                    modified_on = prop_dict.get('modified_on')
                     property_dict.update({
                         'IDENT_Code': entity.code,
                         'IDENT_Namespace': ns,
                         'IDENT_PropertyName': prop_name,
                         'IDENT_PropertyValue': prop_dict.get('value'),
-                        'IDENT_PropertyModifiedOn': prop_dict.get('modified_on').isoformat(),
+                        'IDENT_PropertyModifiedOn': modified_on.isoformat()
+                        if modified_on else "",
                     })
 
                     csv_writer.writerow(property_dict)

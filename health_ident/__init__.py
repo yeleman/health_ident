@@ -8,10 +8,12 @@ import datetime
 
 LAST_EXPORT_PATH = 'last_export'
 
+
 def get_last_export():
     try:
         with open(LAST_EXPORT_PATH, 'r') as f:
-            return datetime.date(*[int(p) for p in f.read().strip().split("-")])
+            return datetime.date(
+                *[int(p) for p in f.read().strip().split("-")])
     except:
         return None
 

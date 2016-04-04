@@ -17,7 +17,6 @@ from django.utils.translation import ugettext as _
 from django.contrib.sites.models import Site
 
 from health_ident import get_last_export
-from health_ident.models import HealthEntity, Entity, AdministrativeEntity
 from health_ident.storage import IdentEntity
 
 
