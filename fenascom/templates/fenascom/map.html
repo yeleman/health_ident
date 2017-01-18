@@ -59,8 +59,10 @@
 
 
 <link href='https://snisi.sante.gov.ml/static/css/map.min.css' rel='stylesheet' />
-<script>L_PREFER_CANVAS = true;</script>
+<script>
+L_PREFER_CANVAS = true;</script>
 <script src='https://snisi.sante.gov.ml/static/js/map.js'></script>
+<script type="text/javascript">L.mapbox.accessToken = 'pk.eyJ1IjoicmdhdWRpbiIsImEiOiJjaXkycWp4YWMwMDJhMzNyeG56Y3I5MXNzIn0.WUHpuOyVyA13sJQ1TlK_jQ';</script>
 
 
 <script>
@@ -80,7 +82,8 @@ mapManager = getMalariaMapManager({
     indicator_scale: scale,
     indicators: all_indicators,
     indicator_api_url: "https://snisi.sante.gov.ml/api/vaccination/indicators",
-    geojson_api_url: "https://snisi.sante.gov.ml/api/geojson/vacc_coverage_routine/"
+    geojson_api_url: "https://snisi.sante.gov.ml/api/geojson/vacc_coverage_routine/",
+    tiles_url_tmpl: 'https://{s}.tiles.sante.gov.ml/default/#SLUG#-#SUFFIX#/{z}/{x}/{y}.png';
     });
 //colors: ["#f03b20", "#fec44f", "#99d8c9", "#2ca25f"]
 
